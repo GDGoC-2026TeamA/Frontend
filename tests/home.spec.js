@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './workspace-fixture'
 import AxeBuilder from '@axe-core/playwright'
 
 test('home matches design slots, uses local original artwork, and keeps actions honest', async ({

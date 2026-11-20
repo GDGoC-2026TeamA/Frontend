@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './workspace-fixture'
 import AxeBuilder from '@axe-core/playwright'
 
 test('loading cancels without losing input; sample error retries and replaces the file', async ({

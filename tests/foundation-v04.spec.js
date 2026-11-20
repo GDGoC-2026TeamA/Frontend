@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './workspace-fixture'
 import AxeBuilder from '@axe-core/playwright'
 
 test('account disclosure closes outside and Escape restores focus; forms stay local', async ({
