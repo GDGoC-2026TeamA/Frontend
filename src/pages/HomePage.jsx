@@ -10,6 +10,7 @@ import { WorkRegistration } from '../components/home/WorkRegistration'
 import { FileText, ArrowRight } from '../components/ui/DesignIcons'
 import { Badge, Button, Modal, StatePanel, SaveToast } from '../components/ui'
 import { getHomeDashboard } from '../services/homeService'
+import { beginLearningSession } from '../services/learningSessions'
 import {
   useDemoTasks,
   saveDemoTask,
@@ -57,6 +58,16 @@ export default function HomePage() {
     return () => controller.abort()
   }, [retry])
   const openAction = (item, label) => {
+    if (label === '새 방식 익히기') {
+      const session =
+        data?.source === 'demo' ? beginLearningSession(item) : null
+      navigate(
+        '/learn/' +
+          encodeURIComponent(session?.snapshot.taskId || item?.id || 'missing'),
+        { state: { learningSessionId: session?.id } },
+      )
+      return
+    }
     if (label === '업무 처리하기' && item?.name?.includes('재고')) {
       navigate('/work/input')
       return
@@ -286,6 +297,7 @@ export default function HomePage() {
               }
               task={selectedTask}
               onClose={closeRegistration}
+              onLearn={(record) => openAction(record, '새 방식 익히기')}
               onSave={(record) => {
                 const saved = saveDemoTask(record)
                 setNotice(

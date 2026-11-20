@@ -31,6 +31,20 @@ const snapshot = () => tasks
 export function useDemoTasks() {
   return useSyncExternalStore(subscribe, snapshot)
 }
+export function getDemoLearningTask(taskId) {
+  const key = taskId === 'inventory' ? '1' : String(taskId)
+  const task = tasks.find((item) => String(item.id) === key)
+  return task ? structuredClone(task) : null
+}
+export function markDemoLearningComplete(taskId, version) {
+  const task = tasks.find((item) => String(item.id) === String(taskId))
+  if (!task || (task.publishedSnapshot?.version || task.version) !== version)
+    return
+  tasks = tasks.map((item) =>
+    item.id === task.id ? { ...item, learningStatus: '학습 완료' } : item,
+  )
+  listeners.forEach((listener) => listener())
+}
 export function saveDemoTask(task) {
   if (task.scope === 'shared')
     throw new Error('공유받은 업무는 수정할 수 없어요.')

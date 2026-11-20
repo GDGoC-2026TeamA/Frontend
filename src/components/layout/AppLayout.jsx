@@ -8,6 +8,7 @@ import { Modal, Drawer, Button } from '../ui'
 function locationLabel(pathname) {
   if (pathname === '/') return '홈'
   if (pathname === '/tasks') return '업무 목록'
+  if (pathname.startsWith('/learn/')) return '새 방식 익히기'
   if (pathname === '/work-cards') return '개인 업무 카드'
   if (pathname === '/history') return '작업 내역'
   if (pathname === '/work/new') return '새 업무 등록'
@@ -22,6 +23,7 @@ export function AppLayout({
   homeAside,
   onHomeHelp,
   variant,
+  className = '',
 }) {
   const location = useLocation()
   const isHome =
@@ -38,7 +40,9 @@ export function AppLayout({
     window.scrollTo({ top: 0 })
   }, [location.pathname])
   return (
-    <div className={`app-layout ${isHome ? 'app-layout--home' : ''}`}>
+    <div
+      className={`app-layout ${isHome ? 'app-layout--home' : ''} ${className}`}
+    >
       <a href="#main-content" className="skip-link">
         본문으로 바로가기
       </a>

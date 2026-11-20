@@ -24,3 +24,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 import './styles/foundation.css'
 
 import './styles/phase2-v04.css'
+import './styles/learning.css'
