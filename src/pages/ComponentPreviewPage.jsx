@@ -1,3 +1,4 @@
+import { FoundationPreview } from '../components/ui/FoundationPreview'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, Plus, PanelRightOpen } from 'lucide-react'
 import { PageHeader } from '../components/layout/PageHeader'
@@ -88,7 +89,7 @@ export default function ComponentPreviewPage() {
       <PageHeader
         eyebrow="WORK BRIDGE / UI FOUNDATION"
         title="공통 컴포넌트"
-        description="수정된 디자인 시스템 V0.2의 스타일과 화면 상태를 한곳에서 확인합니다."
+        description="수정된 디자인 시스템 V0.4의 스타일과 화면 상태를 한곳에서 확인합니다."
         action={<Badge>개발용 확인 화면</Badge>}
       />
       <div className="preview-intro">
@@ -495,6 +496,7 @@ export default function ComponentPreviewPage() {
         </div>
       </Card>
 
+      <FoundationPreview />
       <Modal
         open={modal}
         onClose={() => setModal(false)}
