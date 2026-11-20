@@ -74,15 +74,11 @@ test('home matches design slots, uses local original artwork, and keeps actions 
     .getByRole('button', { name: '업무 처리하기', exact: true })
     .first()
     .click()
-  const dialog = page.getByRole('dialog', {
-    name: '업무 처리하기',
-    exact: true,
-  })
+  await expect(page).toHaveURL(/\/work\/input$/)
   await expect(
-    dialog.getByText('재고 입고 기록', { exact: true }),
+    page.getByRole('heading', { name: '업무 자료 입력', exact: true }),
   ).toBeVisible()
-  await expect(dialog.getByText(/다음 차수/)).toBeVisible()
-  await page.keyboard.press('Escape')
+  await page.getByRole('link', { name: '‹ 홈', exact: true }).click()
   await page.getByRole('link', { name: '전체 보기', exact: true }).click()
   await expect(page).toHaveURL(/\/history$/)
   expect(writes).toEqual([])
@@ -156,8 +152,11 @@ test('in-place search supports recommendations, keyboard results, clear, empty a
   await page.getByRole('button', { name: '검색어 지우기' }).click()
   await expect(input).toHaveValue('')
   await input.fill('없는업무')
-  await expect(page.getByText('일치하는 업무나 카드가 없어요')).toBeVisible()
-  await page.getByRole('button', { name: '검색어 다시 입력' }).click()
+  await expect(page.getByText('검색 결과가 없어요')).toBeVisible()
+  await page
+    .locator('.home-search__empty')
+    .getByRole('button', { name: '검색어 지우기' })
+    .click()
   await expect(input).toHaveValue('')
   await input.press('Escape')
   await expect(input).toHaveAttribute('aria-expanded', 'false')
