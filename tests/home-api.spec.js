@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './workspace-fixture'
 import { spawn } from 'node:child_process'
 
 const apiPort = process.env.PLAYWRIGHT_API_PORT || '5174'
@@ -22,6 +22,7 @@ test.beforeAll(async () => {
       env: {
         ...process.env,
         VITE_DATA_MODE: 'api',
+        VITE_AUTH_SESSION_PATH: '/__test/session',
         VITE_API_BASE_URL: 'https://gdgoc2026a.up.railway.app/api/v1',
       },
       stdio: 'ignore',

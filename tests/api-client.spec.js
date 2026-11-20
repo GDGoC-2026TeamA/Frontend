@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './workspace-fixture'
 
 // Test the transport module in an inert document so Vite's application dependency
 // optimization and HMR cannot navigate away during page.evaluate().

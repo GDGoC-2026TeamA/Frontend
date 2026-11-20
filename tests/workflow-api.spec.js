@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './workspace-fixture'
 import { spawn } from 'node:child_process'
 const port = String(Number(process.env.PLAYWRIGHT_API_PORT || 5174) + 2)
 const apiURL = `http://127.0.0.1:${port}`
 const headers = {
   'access-control-expose-headers': 'Content-Disposition',
-  'access-control-allow-origin': '*',
+  'access-control-allow-origin': apiURL,
+  'access-control-allow-credentials': 'true',
   'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS',
   'access-control-allow-headers': 'Content-Type',
 }
@@ -21,7 +22,11 @@ test.beforeAll(async () => {
       '--strictPort',
     ],
     {
-      env: { ...process.env, VITE_DATA_MODE: 'api' },
+      env: {
+        ...process.env,
+        VITE_DATA_MODE: 'api',
+        VITE_AUTH_SESSION_PATH: '/__test/session',
+      },
       windowsHide: true,
       stdio: 'ignore',
     },
