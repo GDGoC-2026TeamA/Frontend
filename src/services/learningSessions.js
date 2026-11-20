@@ -2,6 +2,9 @@ import { createLearningSnapshot } from './learningModel'
 
 // Private in-memory records. Never added to the task publication model or localStorage.
 const sessions = new Map()
+export function clearLearningSessions() {
+  sessions.clear()
+}
 export function beginLearningSession(task, id = crypto.randomUUID()) {
   if (sessions.has(id)) return sessions.get(id)
   const snapshot = createLearningSnapshot(task)

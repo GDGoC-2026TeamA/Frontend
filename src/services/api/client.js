@@ -28,17 +28,23 @@ export async function apiRequest(
     `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`,
     {
       method,
+      ...(import.meta.env.VITE_AUTH_SESSION_PATH
+        ? { credentials: 'include' }
+        : {}),
       signal,
       headers,
       // The browser must add the multipart boundary for FormData.
       body: body === undefined || isForm ? body : JSON.stringify(body),
     },
   )
-  if (!response.ok)
+  if (!response.ok) {
+    if (response.status === 401 && import.meta.env.VITE_AUTH_SESSION_PATH)
+      window.dispatchEvent(new Event('workbridge:session-expired'))
     throw new ApiError(
       '요청을 마치지 못했어요. 잠시 후 다시 시도해 주세요.',
       response.status,
     )
+  }
   if (responseType === 'response') return response
   if (response.status === 204) return null
   return response.json()

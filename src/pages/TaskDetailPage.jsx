@@ -22,8 +22,13 @@ export default function TaskDetailPage() {
           else setError('업무를 찾을 수 없어요.')
         }
       })
-      .catch(() => {
-        if (!controller.signal.aborted) setError('업무를 불러오지 못했어요.')
+      .catch((cause) => {
+        if (!controller.signal.aborted)
+          setError(
+            cause.status === 403
+              ? '이 업무를 열 수 없어요. 현재 작업 공간의 참여 상태와 업무의 공유 여부를 확인해 주세요.'
+              : '업무를 불러오지 못했어요.',
+          )
       })
     return () => controller.abort()
   }, [taskId, retry])
