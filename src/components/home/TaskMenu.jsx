@@ -14,11 +14,13 @@ export function TaskMenu({ task, onAction }) {
     return () => document.removeEventListener('pointerdown', close)
   }, [open])
   const actions =
-    task.scope === 'shared'
-      ? ['공유 업무 확인']
+    task.scope !== 'owned'
+      ? ['업무 정보 보기']
       : [
-          '비교 내용 확인',
-          ...(task.publication === 'published' ? ['새 버전 검토'] : []),
+          '이름과 설명 수정',
+          '자료 교체와 비교 내용 재검토',
+          '공유 설정',
+          '업무 삭제',
         ]
   return (
     <div
@@ -47,6 +49,13 @@ export function TaskMenu({ task, onAction }) {
       </button>
       {open && (
         <div className="task-menu__panel">
+          <h4>{task.scope === 'owned' ? task.name : '공유받은 업무'}</h4>
+          {task.scope !== 'owned' && (
+            <p>
+              등록자 {task.owner || '확인 필요'} / 기준 v
+              {task.publishedSnapshot?.version || task.version || '확인 필요'}
+            </p>
+          )}
           {actions.map((label) => (
             <button
               type="button"

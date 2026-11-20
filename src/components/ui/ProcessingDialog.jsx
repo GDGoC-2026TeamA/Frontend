@@ -18,6 +18,7 @@ export function ProcessingDialog({
     if (phase === 'loading' || phase === 'error') message.current?.focus()
   }, [phase])
   const loading = phase === 'loading'
+  if (!loading && phase !== 'error') return null
   const title = loading
     ? '검토할 초안을 만들고 있어요'
     : isExample

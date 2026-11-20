@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
 import { Header } from '../components/layout/Header'
 import { HomeSearch } from '../components/home/HomeSearch'
 import { HomeOverview } from '../components/home/HomeOverview'
 import { HomeOnboarding } from '../components/home/HomeOnboarding'
+import { useAccount } from '../services/accountService'
+import { GuideDialog } from '../components/ui/GuideDialog'
+import { TaskManagementDialog } from '../components/home/TaskManagementDialog'
 import { WorkTile } from '../components/home/WorkTile'
 import { WorkRegistration } from '../components/home/WorkRegistration'
 import { FileText, ArrowRight } from '../components/ui/DesignIcons'
@@ -36,6 +39,10 @@ export default function HomePage() {
   const [action, setAction] = useState(null)
   const [filter, setFilter] = useState('all')
   const [selectedTask, setSelectedTask] = useState(null)
+  const account = useAccount()
+  const firstSaved = useRef(false)
+  const [firstGuide, setFirstGuide] = useState(false)
+  const [management, setManagement] = useState(null)
   const [notice, setNotice] = useState('')
   const demoTasks = useDemoTasks()
   const demoWork = useDemoWork()
@@ -66,6 +73,14 @@ export default function HomePage() {
     return () => controller.abort()
   }, [retry])
   const openAction = (item, label) => {
+    if (['이름과 설명 수정', '공유 설정', '업무 삭제'].includes(label)) {
+      setManagement({ task: item, action: label })
+      return
+    }
+    if (label === '자료 교체와 비교 내용 재검토')
+      label =
+        item.publication === 'published' ? '새 버전 검토' : '비교 내용 확인'
+    if (label === '업무 정보 보기') label = '공유 업무 확인'
     if (label === '새 방식 익히기') {
       const session =
         data?.source === 'demo' ? beginLearningSession(item) : null
@@ -110,6 +125,10 @@ export default function HomePage() {
     })
   }
   const closeRegistration = () => {
+    if (firstSaved.current) {
+      firstSaved.current = false
+      setFirstGuide(true)
+    }
     setSelectedTask(null)
     if (location.pathname === '/work/new') navigate('/')
   }
@@ -186,7 +205,7 @@ export default function HomePage() {
                 id="home-registered"
                 aria-labelledby="registered-work-title"
               >
-                <h2 id="registered-work-title">
+                <h2 id="registered-work-title" tabIndex={-1}>
                   {listOnly
                     ? `등록된 업무 ${filteredTasks.length}개`
                     : '등록된 업무'}
@@ -239,9 +258,13 @@ export default function HomePage() {
                         ? '공유받은 업무가 없어요'
                         : filter === 'owned'
                           ? '내가 등록한 업무가 없어요'
-                          : '등록된 업무가 없어요'
+                          : data.source === 'demo' && !data.tasks.length
+                            ? '첫 업무를 등록해 보세요'
+                            : '등록된 업무가 없어요'
                     }
-                    description="새 업무를 등록하고 기준 자료를 연결하세요."
+                    description="전에 쓰던 양식과 새 시스템 매뉴얼을 올리면, 달라진 절차를 한눈에 볼 수 있어요."
+                    actionLabel="첫 업무 등록하기"
+                    onAction={() => navigate('/work/new')}
                   />
                 )}
               </section>
@@ -335,7 +358,13 @@ export default function HomePage() {
               onClose={closeRegistration}
               onLearn={(record) => openAction(record, '새 방식 익히기')}
               onSave={(record) => {
-                const saved = saveDemoTask(record)
+                const saved = saveDemoTask({
+                  ...record,
+                  owner: record.id
+                    ? record.owner
+                    : account.user?.name || '이서연',
+                })
+                if (!data.tasks.length) firstSaved.current = true
                 setNotice(
                   '예시 업무를 이 탭에 저장했어요. 서버에는 저장하지 않았어요.',
                 )
@@ -347,6 +376,22 @@ export default function HomePage() {
               }}
             />
           )}
+          <TaskManagementDialogSlot
+            management={management}
+            apiMode={data?.source === 'api'}
+            onClose={() => setManagement(null)}
+            onReview={(task) => {
+              setManagement(null)
+              setSelectedTask(task)
+            }}
+            onSaved={setNotice}
+          />
+          <GuideDialog
+            variant="first-task"
+            open={firstGuide}
+            onClose={() => setFirstGuide(false)}
+            targets={['home-registered']}
+          />
           <HomeOnboarding open={tour} onClose={() => setTour(false)} />
           <Modal
             open={!!action}
@@ -370,4 +415,14 @@ export default function HomePage() {
       )}
     </AppLayout>
   )
+}
+
+function TaskManagementDialogSlot({ management, ...props }) {
+  return management ? (
+    <TaskManagementDialog
+      key={`${management.task.id}-${management.action}`}
+      {...management}
+      {...props}
+    />
+  ) : null
 }

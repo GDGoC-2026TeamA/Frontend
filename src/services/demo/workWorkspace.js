@@ -59,6 +59,10 @@ let records = {
   })),
 }
 const listeners = new Set()
+export function clearDemoWork() {
+  records = { jobs: [], cards: [] }
+  listeners.forEach((listener) => listener())
+}
 export const useDemoWork = () =>
   useSyncExternalStore(
     (listener) => {

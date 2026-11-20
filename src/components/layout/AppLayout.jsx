@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { signOut } from '../../services/accountService'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { HomeQuickPanel } from './HomeQuickPanel'
 import { Modal, Drawer, Button } from '../ui'
 
 function locationLabel(pathname) {
+  if (pathname === '/profile') return '내 프로필'
+  if (pathname === '/settings') return '계정 설정'
   if (pathname === '/') return '홈'
   if (pathname === '/tasks') return '업무 목록'
   if (pathname.startsWith('/tasks/')) return '업무 상세'
@@ -29,6 +32,9 @@ export function AppLayout({
   className = '',
 }) {
   const location = useLocation()
+  const navigate = useNavigate()
+  const [logoutBusy, setLogoutBusy] = useState(false)
+  const [logoutError, setLogoutError] = useState('')
   const isHome =
     variant === 'home' ||
     location.pathname === '/' ||
@@ -37,6 +43,23 @@ export function AppLayout({
   const [help, setHelp] = useState(false)
   const [menu, setMenu] = useState(false)
   const [accountAction, setAccountAction] = useState(null)
+  useEffect(() => {
+    const handler = () => {
+      setLogoutError('')
+      setAccountAction('로그아웃')
+    }
+    window.addEventListener('workbridge:logout', handler)
+    return () => window.removeEventListener('workbridge:logout', handler)
+  }, [])
+  const openAccount = (action) => {
+    setMenu(false)
+    if (action === '프로필') navigate('/profile')
+    else if (action === '설정') navigate('/settings')
+    else {
+      setLogoutError('')
+      setAccountAction(action)
+    }
+  }
   useEffect(() => {
     document.title = `${locationLabel(location.pathname)} | WORK BRIDGE`
     document.getElementById('page-title')?.focus({ preventScroll: true })
@@ -58,7 +81,7 @@ export function AppLayout({
       >
         <aside className="sidebar">
           <Sidebar
-            onAccountAction={setAccountAction}
+            onAccountAction={openAccount}
             variant={isHome ? 'home' : 'work'}
             onHelp={onHomeHelp || (() => setHelp(true))}
           />
@@ -94,7 +117,7 @@ export function AppLayout({
         className="mobile-nav"
       >
         <Sidebar
-          onAccountAction={setAccountAction}
+          onAccountAction={openAccount}
           mobile
           variant={isHome ? 'home' : 'work'}
           onNavigate={() => setMenu(false)}
@@ -107,16 +130,50 @@ export function AppLayout({
       </Drawer>
       <Modal
         open={!!accountAction}
-        onClose={() => setAccountAction(null)}
-        title={accountAction || '내 계정'}
+        onClose={() => {
+          if (!logoutBusy) setAccountAction(null)
+        }}
+        title="로그아웃할까요?"
         footer={
-          <Button onClick={() => setAccountAction(null)}>돌아가기</Button>
+          <>
+            <Button
+              variant="secondary"
+              disabled={logoutBusy}
+              onClick={() => setAccountAction(null)}
+            >
+              취소
+            </Button>
+            <Button
+              loading={logoutBusy}
+              onClick={async () => {
+                if (logoutBusy) return
+                setLogoutBusy(true)
+                setLogoutError('')
+                try {
+                  await signOut()
+                  setAccountAction(null)
+                  navigate('/login', { replace: true })
+                } catch (cause) {
+                  setLogoutError(cause.message)
+                } finally {
+                  setLogoutBusy(false)
+                }
+              }}
+            >
+              로그아웃
+            </Button>
+          </>
         }
       >
-        <p>
-          계정 관리와 로그인은 ‘추가 / 계정과 첫 사용’ 및 ‘최종 / 프로필과 계정
-          설정’ 화면을 연결할 때 사용할 수 있어요. 현재 계정은 바뀌지 않았어요.
+        <p>다시 로그인하면 내 업무와 기록을 볼 수 있어요.</p>
+        <p className="account-demo-note">
+          예시 모드에서는 로그아웃하면 이 탭의 예시 기록이 지워져요.
         </p>
+        {logoutError && (
+          <p role="alert" className="account-error">
+            {logoutError}
+          </p>
+        )}
       </Modal>
       <Modal
         open={help}
