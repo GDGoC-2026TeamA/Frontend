@@ -31,6 +31,9 @@ const swatches = [
   ['약한 글자', 'muted', '#667085'],
   ['구분선', 'border', '#E4E7EC'],
   ['입력란 테두리', 'input-border', '#858E9B'],
+  ['홈 외곽 배경', 'home-canvas', '#EEF3F9'],
+  ['재고 일러스트 배경', 'inventory-artwork', '#FFF1E6'],
+  ['예약 일러스트 배경', 'reservation-artwork', '#EAF6F4'],
 ]
 const sections = [
   ['tokens', '색상과 글자'],
@@ -85,7 +88,7 @@ export default function ComponentPreviewPage() {
       <PageHeader
         eyebrow="WORK BRIDGE / UI FOUNDATION"
         title="공통 컴포넌트"
-        description="A 시안의 스타일과 화면 상태를 한곳에서 확인합니다."
+        description="수정된 디자인 시스템 V0.2의 스타일과 화면 상태를 한곳에서 확인합니다."
         action={<Badge>개발용 확인 화면</Badge>}
       />
       <div className="preview-intro">
@@ -132,6 +135,7 @@ export default function ComponentPreviewPage() {
         </div>
         <div className="stack">
           {[
+            ['home-title', '내 업무', '42 / 54 · Bold · 홈 제목'],
             ['page', '페이지 제목', '28 / 40 · Bold'],
             ['section', '영역 제목', '20 / 30 · Bold'],
             ['card', '카드 제목', '18 / 28 · Bold'],

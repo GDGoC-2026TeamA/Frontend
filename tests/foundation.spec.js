@@ -215,16 +215,41 @@ test('demo response states and error recovery', async ({ page }) => {
 test('desktop and mobile layouts and accessibility', async ({
   page,
 }, testInfo) => {
+  await page.setViewportSize({ width: 1440, height: 1080 })
   await page.goto('/')
   await page.evaluate(() => document.fonts.ready)
-  await expect(page.locator('.sidebar')).toHaveCSS('width', '240px')
-  await expect(page.locator('.header')).toHaveCSS('height', '72px')
+  await expect(page.locator('.sidebar')).toHaveCSS('width', '208px')
+  await expect(page.locator('.page-header--home h1')).toHaveCSS(
+    'font-size',
+    '42px',
+  )
+  await expect(page.locator('.header__search--home')).toHaveCSS(
+    'width',
+    '226px',
+  )
+  await expect(page.locator('.header__search--home')).toHaveCSS(
+    'height',
+    '42px',
+  )
+  await expect(
+    page.getByRole('complementary', { name: '빠른 확인' }),
+  ).toHaveCSS('width', '368px')
+  const frame = await page.locator('.home-workspace').boundingBox()
+  expect(frame).toMatchObject({ x: 36, y: 58, width: 1368, height: 964 })
+  await expect(
+    page.locator('.home-workspace > .app-layout__workspace'),
+  ).toHaveCSS('width', '792px')
+  await expect(page.locator('.header')).toHaveCount(0)
   await page.screenshot({
     path: testInfo.outputPath('home-desktop.png'),
     fullPage: true,
   })
   for (const path of ['/', '/dev/components']) {
     await page.goto(path)
+    if (path !== '/') {
+      await expect(page.locator('.sidebar')).toHaveCSS('width', '240px')
+      await expect(page.locator('.header')).toHaveCSS('height', '72px')
+    }
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze()
@@ -263,6 +288,21 @@ test('desktop and mobile layouts and accessibility', async ({
     path: testInfo.outputPath('components-mobile.png'),
     fullPage: true,
   })
+  await page.goto('/')
+  await page.screenshot({
+    path: testInfo.outputPath('home-mobile.png'),
+    fullPage: true,
+  })
+  for (const width of [320, 768, 1024]) {
+    await page.setViewportSize({ width, height: 900 })
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true)
+  }
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/dev/components')
   await page
     .getByRole('button', { name: 'AI 패널 구조 보기', exact: true })
     .click()

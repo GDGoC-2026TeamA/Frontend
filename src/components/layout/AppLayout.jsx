@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { HomeQuickPanel } from './HomeQuickPanel'
 import { Modal, Drawer, Button } from '../ui'
 
 function locationLabel(pathname) {
@@ -13,8 +14,9 @@ function locationLabel(pathname) {
   return '페이지 안내'
 }
 
-export function AppLayout({ children, assistant }) {
+export function AppLayout({ children, assistant, homeAside }) {
   const location = useLocation()
+  const isHome = location.pathname === '/'
   const [help, setHelp] = useState(false)
   const [menu, setMenu] = useState(false)
   useEffect(() => {
@@ -23,26 +25,38 @@ export function AppLayout({ children, assistant }) {
     window.scrollTo({ top: 0 })
   }, [location.pathname])
   return (
-    <div className="app-layout">
+    <div className={`app-layout ${isHome ? 'app-layout--home' : ''}`}>
       <a href="#main-content" className="skip-link">
         본문으로 바로가기
       </a>
-      <aside className="sidebar">
-        <Sidebar onHelp={() => setHelp(true)} />
-      </aside>
-      <div className="app-layout__workspace">
-        <Header
-          locationLabel={locationLabel(location.pathname)}
-          onMenu={() => setMenu(true)}
-        />
-        <div className={`app-layout__body ${assistant ? 'has-assistant' : ''}`}>
-          <main id="main-content" className="main-content" tabIndex={-1}>
-            {children || <Outlet />}
-          </main>
-          {assistant && (
-            <div className="app-layout__assistant">{assistant}</div>
+      <div className={isHome ? 'home-workspace' : 'work-workspace'}>
+        <aside className="sidebar">
+          <Sidebar
+            variant={isHome ? 'home' : 'work'}
+            onHelp={() => setHelp(true)}
+          />
+        </aside>
+        <div className="app-layout__workspace">
+          {!isHome && (
+            <Header
+              locationLabel={locationLabel(location.pathname)}
+              onMenu={() => setMenu(true)}
+            />
           )}
+          <div
+            className={`app-layout__body ${assistant ? 'has-assistant' : ''}`}
+          >
+            <main id="main-content" className="main-content" tabIndex={-1}>
+              {children || (
+                <Outlet context={{ openMenu: () => setMenu(true) }} />
+              )}
+            </main>
+            {assistant && (
+              <div className="app-layout__assistant">{assistant}</div>
+            )}
+          </div>
         </div>
+        {isHome && <HomeQuickPanel>{homeAside}</HomeQuickPanel>}
       </div>
       <Drawer
         open={menu}
@@ -52,6 +66,7 @@ export function AppLayout({ children, assistant }) {
       >
         <Sidebar
           mobile
+          variant={isHome ? 'home' : 'work'}
           onNavigate={() => setMenu(false)}
           onHelp={() => {
             setMenu(false)
