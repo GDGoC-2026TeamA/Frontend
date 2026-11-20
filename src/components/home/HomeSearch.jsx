@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { Button } from '../ui'
 import { IconSearch, Home, BookOpen } from '../ui/DesignIcons'
+import { StatusIcon } from '../ui/StatusIcon'
 import clearIcon from '../../assets/home/search-clear.svg?no-inline'
 import chevronIcon from '../../assets/home/search-chevron.svg?no-inline'
 
@@ -180,7 +181,8 @@ export function HomeSearch({ data, onSelect }) {
               </ul>
               {!results.length && (
                 <div className="home-search__empty" role="status">
-                  <p>일치하는 업무나 카드가 없어요</p>
+                  <StatusIcon type="search" />
+                  <p>검색 결과가 없어요</p>
                   <small>다른 업무 이름이나 카드 제목으로 검색해 보세요.</small>
                   <Button
                     variant="secondary"
@@ -189,7 +191,7 @@ export function HomeSearch({ data, onSelect }) {
                       input.current.focus()
                     }}
                   >
-                    검색어 다시 입력
+                    검색어 지우기
                   </Button>
                 </div>
               )}

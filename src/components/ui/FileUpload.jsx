@@ -21,6 +21,7 @@ export function FileUpload({
   multiple = false,
   disabled = false,
   loading = false,
+  buttonLabel,
   error,
   hint = '파일은 이 화면에서만 선택됩니다. 서버로 전송하거나 내용을 분석하지 않아요.',
 }) {
@@ -82,7 +83,7 @@ export function FileUpload({
         >
           {loading
             ? '파일 선택을 준비하고 있어요'
-            : '파일을 선택하거나 여기에 놓으세요'}
+            : buttonLabel || '파일을 선택하거나 여기에 놓으세요'}
         </Button>
         <input
           ref={inputRef}

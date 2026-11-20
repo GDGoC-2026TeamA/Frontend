@@ -32,11 +32,16 @@ export default function HomePage() {
       })
     return () => controller.abort()
   }, [retry])
-  const openAction = (item, label) =>
+  const openAction = (item, label) => {
+    if (label === '업무 처리하기' && item?.name?.includes('재고')) {
+      navigate('/work/input')
+      return
+    }
     setAction({
       title: label,
       name: item?.name || item?.title,
     })
+  }
   const searchSelect = (item) => {
     if (item.type === 'task') openAction(item, '업무 상세')
     else openAction(item, '절차 보기')

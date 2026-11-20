@@ -31,16 +31,13 @@ export function Sidebar({
     <div
       className={`sidebar__content ${home ? 'sidebar__content--home' : ''} ${mobile ? 'sidebar__content--mobile' : ''}`}
     >
-      <Link
-        to="/"
-        className="brand"
-        onClick={onNavigate}
-        aria-label="WORK BRIDGE 홈"
-      >
+      <Link to="/" className="brand" onClick={onNavigate}>
         <span className="brand__mark" aria-hidden="true">
           W
         </span>
-        <span>WORK BRIDGE</span>
+        <span>
+          WORK BRIDGE<span className="sr-only"> 홈</span>
+        </span>
       </Link>
       <nav aria-label="주요 메뉴">
         <p className="sidebar__label">워크스페이스</p>

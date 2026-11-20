@@ -103,3 +103,52 @@ test('API home shows loading, 404, retry, empty and server data without demo fal
   await expect(page.getByText('재고 입고 기록', { exact: true })).toHaveCount(0)
   await expect(page.locator('.home-recent__row')).toHaveCount(0)
 })
+
+test('collection API distinguishes failed, empty and populated responses', async ({
+  page,
+}) => {
+  let status = 503
+  let items = []
+  await page.route('**/api/v1/cards', (route) =>
+    route.fulfill({
+      status,
+      json: status === 200 ? { items } : { detail: 'unavailable' },
+    }),
+  )
+  await page.goto(apiURL + '/work-cards')
+  await expect(page.getByRole('alert')).toContainText(
+    '목록을 불러오지 못했어요',
+  )
+  await expect(
+    page.getByRole('heading', {
+      name: '저장한 업무 카드가 없어요',
+      exact: true,
+    }),
+  ).toHaveCount(0)
+  status = 200
+  await page.getByRole('button', { name: '다시 시도', exact: true }).click()
+  await expect(
+    page.getByRole('heading', {
+      name: '저장한 업무 카드가 없어요',
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('예시 모드의 빈 목록이에요.', { exact: false }),
+  ).toHaveCount(0)
+  items = [{ id: 345, title: '서버에서 받은 절차' }]
+  await page.reload()
+  await expect(
+    page.getByRole('heading', { name: '서버에서 받은 절차', exact: true }),
+  ).toBeVisible()
+  await page.route('**/api/v1/jobs', (route) =>
+    route.fulfill({ status: 200, json: { items: [] } }),
+  )
+  await page.goto(apiURL + '/history')
+  await expect(
+    page.getByRole('heading', {
+      name: '아직 시작한 작업이 없어요',
+      exact: true,
+    }),
+  ).toBeVisible()
+})
