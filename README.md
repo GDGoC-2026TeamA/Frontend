@@ -229,3 +229,7 @@ VITE_API_BASE_URL=https://gdgoc2026a.up.railway.app/api/v1
 ## 4차 실제 업무 화면
 
 업무 목록에서 상세를 확인하고 재고와 예약 작업을 시작할 수 있습니다. 초안 수정, 검토 후 결과 저장, 개인 업무 카드와 작업 내역을 연결했습니다. 화면 대응과 API 연결 범위는 [PHASE4_WORKFLOW.md](docs/PHASE4_WORKFLOW.md)에 적었습니다.
+
+## 최종 계정과 업무 관리 화면
+
+로그인, 첫 사용, 프로필과 계정 설정, 업무 관리 팝업을 연결했습니다. 예시 동작과 서버 연결 범위, Figma 화면 대응은 [FINAL_FRONTEND.md](docs/FINAL_FRONTEND.md)를 확인하세요.
