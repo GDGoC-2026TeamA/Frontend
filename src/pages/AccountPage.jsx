@@ -104,8 +104,8 @@ export default function AccountPage({ settings = false }) {
           </p>
           {demoAccounts && (
             <p className="account-demo-note">
-              예시 계정이에요. 변경 내용은 이 탭에만 남고 새로고침하면
-              초기화돼요.
+              예시 계정이에요. 이름과 이메일은 이 탭의 예시 세션에 남아요. 실제
+              서버 계정은 바뀌지 않아요.
             </p>
           )}
           {!user ? (

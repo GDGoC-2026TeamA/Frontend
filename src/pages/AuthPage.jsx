@@ -10,6 +10,7 @@ import {
   socialStartUrl,
   startExampleAccount,
   useAccount,
+  hasAccountEndpoint,
 } from '../services/accountService'
 import inventory from '../assets/home/inventory.svg?no-inline'
 
@@ -98,7 +99,10 @@ export default function AuthPage() {
           name: signup ? values.name.trim() : '이서연',
           email: values.email.trim(),
         })
-        navigate('/', { replace: true, state: { firstVisit: true } })
+        navigate(signup ? '/' : safeReturnPath(location.state?.returnTo), {
+          replace: true,
+          state: { firstVisit: true },
+        })
       } else if (login || signup) {
         const result = await accountRequest(
           signup ? 'signup' : 'login',
@@ -207,6 +211,14 @@ export default function AuthPage() {
                   : titles[route] || '로그인'}
           </h1>
           {!statusOnly && <p className="auth-description">{description}</p>}
+          {!demoAccounts &&
+            (login || signup) &&
+            !hasAccountEndpoint(signup ? 'signup' : 'login') && (
+              <p className="account-demo-note" role="status">
+                회원가입과 로그인은 계정 서버 연결 후 쓸 수 있어요. 현재는
+                화면을 확인할 수 있어요.
+              </p>
+            )}
           {demoAccounts && !statusOnly && (
             <p className="account-demo-note">
               예시 화면이에요. 입력한 비밀번호를 저장하거나 서버에 보내지
@@ -378,9 +390,14 @@ export default function AuthPage() {
             </Button>
           )}
           {login ? (
-            <Link className="auth-back" to="/forgot-password">
-              비밀번호를 잊으셨나요?
-            </Link>
+            <>
+              <Link className="auth-back" to="/signup">
+                처음 오셨나요? 회원가입
+              </Link>
+              <Link className="auth-back" to="/forgot-password">
+                비밀번호를 잊으셨나요?
+              </Link>
+            </>
           ) : (
             <Link className="auth-back" to="/login">
               로그인으로 돌아가기

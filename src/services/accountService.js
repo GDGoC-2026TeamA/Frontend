@@ -2,14 +2,32 @@ import { useSyncExternalStore } from 'react'
 import { clearDemoTasks } from './demo/taskWorkspace'
 import { clearDemoWork } from './demo/workWorkspace'
 import { clearLearningSessions } from './learningSessions'
+import {
+  DEMO_SESSION_KEY,
+  DEMO_SESSION_TTL,
+  readExampleSession,
+  writeExampleSession,
+} from './demoSession'
 
 export const demoAccounts =
   (import.meta.env.VITE_DATA_MODE || 'demo') === 'demo'
+let restored = null
+try {
+  if (demoAccounts) restored = readExampleSession(window.sessionStorage)
+} catch {
+  /* storage unavailable */
+}
+if (demoAccounts && !restored?.exampleWorkspace) clearPrivateWorkspace()
 let account = {
-  user: demoAccounts
-    ? { id: 'example', name: '이서연', email: 'name@example.com' }
-    : null,
+  user: restored?.user || null,
+  expiresAt: restored?.expiresAt || null,
+  status: demoAccounts
+    ? restored
+      ? 'authenticated'
+      : 'anonymous'
+    : 'unchecked',
   signedOut: false,
+  error: '',
 }
 const listeners = new Set()
 const subscribe = (listener) => {
@@ -21,23 +39,52 @@ const setAccount = (next) => {
   account = next
   listeners.forEach((listener) => listener())
 }
+const removeExampleSession = () => {
+  try {
+    sessionStorage.removeItem(DEMO_SESSION_KEY)
+  } catch {
+    /* storage unavailable */
+  }
+}
 export function clearPrivateWorkspace() {
   clearDemoTasks()
   clearDemoWork()
   clearLearningSessions()
 }
 export function expireAccount() {
+  sessionGeneration += 1
+  removeExampleSession()
   clearPrivateWorkspace()
-  setAccount({ user: null, signedOut: false })
+  setAccount({
+    user: null,
+    status: 'anonymous',
+    expiresAt: null,
+    signedOut: true,
+    error: '',
+  })
 }
 export function startExampleAccount({
   name = '이서연',
   email = 'name@example.com',
 } = {}) {
+  if (!demoAccounts)
+    throw new Error('예시 계정은 예시 모드에서만 열 수 있어요.')
+  const user = { id: crypto.randomUUID(), name, email }
+  const expiresAt = Date.now() + DEMO_SESSION_TTL
+  try {
+    writeExampleSession(sessionStorage, user, expiresAt)
+  } catch {
+    throw new Error(
+      '세션을 보관할 수 없어요. 브라우저의 사이트 저장소 설정을 확인해 주세요.',
+    )
+  }
   clearPrivateWorkspace()
   setAccount({
-    user: { id: crypto.randomUUID(), name, email },
+    user,
+    expiresAt,
+    status: 'authenticated',
     signedOut: false,
+    error: '',
   })
 }
 export function safeReturnPath(value) {
@@ -60,11 +107,18 @@ const paths = {
   email: import.meta.env.VITE_AUTH_EMAIL_PATH,
   logout: import.meta.env.VITE_AUTH_LOGOUT_PATH,
 }
+export const hasAccountEndpoint = (action) =>
+  Boolean(
+    paths[action] && (!['login', 'signup'].includes(action) || paths.session),
+  )
 export async function accountRequest(action, body, { signal } = {}) {
   const path = paths[action]
-  if (!path)
-    throw new Error(
-      '아직 계정 서버가 연결되지 않았어요. 담당자에게 연결 상태를 확인해 주세요.',
+  if (!hasAccountEndpoint(action))
+    throw Object.assign(
+      new Error(
+        '아직 계정 서버가 연결되지 않았어요. 담당자에게 연결 상태를 확인해 주세요.',
+      ),
+      { code: 'AUTH_NOT_CONFIGURED' },
     )
   const base = import.meta.env.VITE_API_BASE_URL || window.location.origin
   const url = new URL(path, base.endsWith('/') ? base : base + '/')
@@ -88,12 +142,15 @@ export async function accountRequest(action, body, { signal } = {}) {
       ['profile', 'email', 'logout'].includes(action)
     )
       window.dispatchEvent(new Event('workbridge:session-expired'))
-    throw new Error(
-      response.status === 401
-        ? '이메일과 비밀번호를 다시 확인해 주세요.'
-        : response.status === 403
-          ? '이 작업을 할 권한이 없어요.'
-          : '요청을 마치지 못했어요. 잠시 후 다시 시도해 주세요.',
+    throw Object.assign(
+      new Error(
+        response.status === 401
+          ? '이메일과 비밀번호를 다시 확인해 주세요.'
+          : response.status === 403
+            ? '이 작업을 할 권한이 없어요.'
+            : '요청을 마치지 못했어요. 잠시 후 다시 시도해 주세요.',
+      ),
+      { status: response.status },
     )
   }
   if (response.status === 204) return null
@@ -108,6 +165,7 @@ export function acceptServerAccount(result) {
     typeof result.user.email !== 'string'
   )
     throw new Error('계정 응답을 확인할 수 없어요. 다시 로그인해 주세요.')
+  sessionGeneration += 1
   clearPrivateWorkspace()
   setAccount({
     user: {
@@ -116,7 +174,47 @@ export function acceptServerAccount(result) {
       email: result.user.email,
     },
     signedOut: false,
+    status: 'authenticated',
+    expiresAt: null,
+    error: '',
   })
+}
+let sessionCheck = null
+let sessionGeneration = 0
+export function restoreServerSession() {
+  if (demoAccounts) return Promise.resolve()
+  if (sessionCheck) return sessionCheck
+  const generation = sessionGeneration
+  setAccount({ ...account, status: 'checking', error: '' })
+  sessionCheck = accountRequest('session', undefined, {
+    signal: AbortSignal.timeout(15000),
+  })
+    .then((result) => {
+      if (generation === sessionGeneration) acceptServerAccount(result)
+    })
+    .catch((cause) => {
+      if (generation !== sessionGeneration) return
+      if (cause.status === 401 || cause.code === 'AUTH_NOT_CONFIGURED')
+        setAccount({
+          user: null,
+          status: 'anonymous',
+          signedOut: false,
+          expiresAt: null,
+          error: '',
+        })
+      else
+        setAccount({
+          user: null,
+          status: 'error',
+          signedOut: false,
+          expiresAt: null,
+          error: cause.message,
+        })
+    })
+    .finally(() => {
+      sessionCheck = null
+    })
+  return sessionCheck
 }
 export async function saveAccount(action, value, options) {
   if (!account.user) throw new Error('먼저 로그인해 주세요.')
@@ -133,6 +231,8 @@ export async function saveAccount(action, value, options) {
     typeof result.user.email !== 'string'
   )
     throw new Error('저장 결과를 확인할 수 없어요.')
+  if (demoAccounts)
+    writeExampleSession(sessionStorage, result.user, account.expiresAt)
   setAccount({
     ...account,
     user: {
@@ -144,8 +244,7 @@ export async function saveAccount(action, value, options) {
 }
 export async function signOut(options) {
   if (!demoAccounts) await accountRequest('logout', undefined, options)
-  clearPrivateWorkspace()
-  setAccount({ user: null, signedOut: true })
+  expireAccount()
 }
 export function socialStartUrl(provider) {
   const value =
