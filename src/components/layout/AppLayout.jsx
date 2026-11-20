@@ -7,6 +7,7 @@ import { Modal, Drawer, Button } from '../ui'
 
 function locationLabel(pathname) {
   if (pathname === '/') return '홈'
+  if (pathname === '/tasks') return '업무 목록'
   if (pathname === '/work-cards') return '개인 업무 카드'
   if (pathname === '/history') return '작업 내역'
   if (pathname === '/work/new') return '새 업무 등록'
@@ -26,9 +27,11 @@ export function AppLayout({
   const isHome =
     variant === 'home' ||
     location.pathname === '/' ||
+    location.pathname === '/tasks' ||
     location.pathname === '/work/new'
   const [help, setHelp] = useState(false)
   const [menu, setMenu] = useState(false)
+  const [accountAction, setAccountAction] = useState(null)
   useEffect(() => {
     document.title = `${locationLabel(location.pathname)} | WORK BRIDGE`
     document.getElementById('page-title')?.focus({ preventScroll: true })
@@ -39,9 +42,16 @@ export function AppLayout({
       <a href="#main-content" className="skip-link">
         본문으로 바로가기
       </a>
-      <div className={isHome ? 'home-workspace' : 'work-workspace'}>
+      <div
+        className={
+          isHome
+            ? `home-workspace ${!homeAside ? 'home-workspace--single' : ''}`
+            : 'work-workspace'
+        }
+      >
         <aside className="sidebar">
           <Sidebar
+            onAccountAction={setAccountAction}
             variant={isHome ? 'home' : 'work'}
             onHelp={onHomeHelp || (() => setHelp(true))}
           />
@@ -68,7 +78,7 @@ export function AppLayout({
             )}
           </div>
         </div>
-        {isHome && <HomeQuickPanel>{homeAside}</HomeQuickPanel>}
+        {isHome && homeAside && <HomeQuickPanel>{homeAside}</HomeQuickPanel>}
       </div>
       <Drawer
         open={menu}
@@ -77,6 +87,7 @@ export function AppLayout({
         className="mobile-nav"
       >
         <Sidebar
+          onAccountAction={setAccountAction}
           mobile
           variant={isHome ? 'home' : 'work'}
           onNavigate={() => setMenu(false)}
@@ -87,6 +98,19 @@ export function AppLayout({
           }}
         />
       </Drawer>
+      <Modal
+        open={!!accountAction}
+        onClose={() => setAccountAction(null)}
+        title={accountAction || '내 계정'}
+        footer={
+          <Button onClick={() => setAccountAction(null)}>돌아가기</Button>
+        }
+      >
+        <p>
+          계정 관리와 로그인은 ‘추가 / 계정과 첫 사용’ 및 ‘최종 / 프로필과 계정
+          설정’ 화면을 연결할 때 사용할 수 있어요. 현재 계정은 바뀌지 않았어요.
+        </p>
+      </Modal>
       <Modal
         open={help}
         onClose={() => setHelp(false)}

@@ -1,4 +1,5 @@
 import { Badge, Button } from '../ui'
+import { TaskMenu } from './TaskMenu'
 import inventory from '../../assets/home/inventory.svg?no-inline'
 import reservation from '../../assets/home/reservation.svg?no-inline'
 import blue from '../../assets/home/status-blue.svg?no-inline'
@@ -24,6 +25,7 @@ export function WorkTile({ task, onAction }) {
           <img src={artwork === 'inventory' ? inventory : reservation} alt="" />
         )}
       </div>
+      <TaskMenu task={task} onAction={onAction} />
       <div className="work-tile__content">
         <div className="work-tile__heading">
           <h3>{task.name}</h3>

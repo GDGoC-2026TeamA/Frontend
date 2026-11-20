@@ -15,6 +15,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="work/new" element={<HomePage />} />
+      <Route path="tasks" element={<HomePage />} />
       <Route
         path="work-cards"
         element={<CollectionPage key="cards" kind="cards" />}
