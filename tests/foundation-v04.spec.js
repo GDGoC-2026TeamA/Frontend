@@ -23,7 +23,13 @@ test('account disclosure closes outside and Escape restores focus; forms stay lo
   await expect(trigger).toHaveAttribute('aria-expanded', 'false')
   await trigger.click()
   await scope.getByRole('button', { name: '설정', exact: true }).click()
-  await scope.getByLabel('이메일', { exact: true }).fill('edited@example.com')
+  const email = scope.getByRole('textbox', {
+    name: '이메일 (필수)',
+    exact: true,
+  })
+  await expect(email).toHaveAttribute('required', '')
+  await email.fill('edited@example.com')
+  await expect(email).toHaveValue('edited@example.com')
   await scope.getByRole('button', { name: '이메일 저장' }).click()
   await expect(scope.getByRole('status')).toContainText(
     '서버에는 저장하지 않았어요',
