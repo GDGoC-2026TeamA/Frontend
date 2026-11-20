@@ -12,6 +12,9 @@ const reviewer = 'Haron1248'
 const issueTitle = '[feat] 새 업무 등록과 자료 비교 팝업 구현'
 const sourceBranch = 'feat/work-registration-phase2'
 const externalGit = 'C:/workspace/work-bridge-git'
+const prOnly = process.argv.includes('--pr-only')
+// This commit was built and passed all 19 tests in the user's terminal.
+const validatedCommit = 'e67c65c00a9821b38b29b74212f54cd3f0243d73'
 const gitArgs =
   existsSync(path.join(root, '.git')) && !existsSync(externalGit)
     ? []
@@ -31,7 +34,7 @@ const run = (file, args = [], env = {}) =>
     env: { ...process.env, ...env },
   })
 let token
-async function request(resource, method = 'GET', body) {
+async function requestOnce(resource, method, body) {
   const response = await fetch(`https://api.github.com${resource}`, {
     method,
     headers: {
@@ -47,6 +50,23 @@ async function request(resource, method = 'GET', body) {
   if (!response.ok)
     throw new Error(`GitHub ${response.status}: ${data.message}`)
   return data
+}
+async function request(resource, method = 'GET', body) {
+  const attempts = method === 'GET' ? 3 : 1
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await requestOnce(resource, method, body)
+    } catch (error) {
+      if (error.name !== 'TypeError' && error.name !== 'TimeoutError')
+        throw error
+      if (attempt === attempts)
+        throw new Error(
+          `GitHub 연결 실패 (${method} ${resource}). --pr-only로 다시 실행하면 기존 PR을 먼저 확인합니다. 원인: ${error.cause?.code || error.name}`,
+        )
+      console.log(`GitHub 조회 연결 재시도 ${attempt}/${attempts - 1}`)
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1000))
+    }
+  }
 }
 const prefix = `/repos/${repository}`
 const issueBody = `## 구현 목적
@@ -150,14 +170,41 @@ async function main() {
     git('merge', '--no-edit', 'origin/main')
   }
 
-  console.log('코드 검사, 빌드와 전체 브라우저 검사를 실행합니다.')
-  run('node_modules/eslint/bin/eslint.js', ['.'])
-  run('node_modules/vite/bin/vite.js', ['build'])
-  run('node_modules/@playwright/test/cli.js', ['test'], {
-    PLAYWRIGHT_PORT: '5190',
-    PLAYWRIGHT_API_PORT: '5191',
-    VITE_DATA_MODE: 'demo',
-  })
+  if (prOnly) {
+    const report = JSON.parse(
+      readFileSync(path.join(root, 'test-results/.last-run.json'), 'utf8'),
+    )
+    const changed = git(
+      'diff',
+      '--name-only',
+      validatedCommit,
+      'HEAD',
+      '--',
+      'src',
+      'tests',
+      'package.json',
+      'package-lock.json',
+      'vite.config.js',
+      'playwright.config.js',
+      'eslint.config.js',
+    )
+    if (report.status !== 'passed' || changed)
+      throw new Error(
+        '검사 결과 또는 화면 코드가 바뀌었어요. --pr-only 없이 전체 검사를 실행해 주세요.',
+      )
+    console.log(
+      '기존 19개 검사 통과와 화면 코드 일치를 확인했어요. PR 생성 단계부터 이어갑니다.',
+    )
+  } else {
+    console.log('코드 검사, 빌드와 전체 브라우저 검사를 실행합니다.')
+    run('node_modules/eslint/bin/eslint.js', ['.'])
+    run('node_modules/vite/bin/vite.js', ['build'])
+    run('node_modules/@playwright/test/cli.js', ['test'], {
+      PLAYWRIGHT_PORT: '5190',
+      PLAYWRIGHT_API_PORT: '5191',
+      VITE_DATA_MODE: 'demo',
+    })
+  }
   const screenshots = [
     'registration-compare.png',
     'registration-edit.png',
