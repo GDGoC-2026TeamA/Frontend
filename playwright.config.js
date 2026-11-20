@@ -24,6 +24,8 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
+    // Visual fixtures intentionally use demo data; application defaults use API.
+    env: { VITE_DATA_MODE: 'demo' },
     command: `node node_modules/vite/bin/vite.js --host 127.0.0.1 --port ${port} --strictPort`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,

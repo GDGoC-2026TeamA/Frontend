@@ -1,4 +1,6 @@
-// Transport for the API tracker. Screens remain in demo mode until connected.
+import { apiBaseUrl } from '../config'
+
+// Transport for resource-relative API paths; demo mode must be explicit.
 export class ApiError extends Error {
   constructor(message, status) {
     super(message)
@@ -15,9 +17,7 @@ export async function apiRequest(
 ) {
   if (!['json', 'response'].includes(responseType))
     throw new TypeError('지원하지 않는 응답 형식입니다.')
-  const base =
-    import.meta.env.VITE_API_BASE_URL ||
-    'https://gdgoc2026a.up.railway.app/api/v1'
+  const base = apiBaseUrl
   const isForm = body instanceof FormData
   const headers = {
     Accept: responseType === 'response' ? '*/*' : 'application/json',

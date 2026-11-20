@@ -2,9 +2,9 @@ import { useSyncExternalStore } from 'react'
 import { clearDemoTasks } from './demo/taskWorkspace'
 import { clearDemoWork } from './demo/workWorkspace'
 import { clearLearningSessions } from './learningSessions'
+import { apiBaseUrl, dataMode } from './config'
 
-export const demoAccounts =
-  (import.meta.env.VITE_DATA_MODE || 'demo') === 'demo'
+export const demoAccounts = dataMode === 'demo'
 let account = {
   user: demoAccounts
     ? { id: 'example', name: '이서연', email: 'name@example.com' }
@@ -66,7 +66,7 @@ export async function accountRequest(action, body, { signal } = {}) {
     throw new Error(
       '아직 계정 서버가 연결되지 않았어요. 담당자에게 연결 상태를 확인해 주세요.',
     )
-  const base = import.meta.env.VITE_API_BASE_URL || window.location.origin
+  const base = apiBaseUrl
   const url = new URL(path, base.endsWith('/') ? base : base + '/')
   if (url.origin !== new URL(base).origin)
     throw new Error('계정 API는 설정한 서버에서만 호출할 수 있어요.')

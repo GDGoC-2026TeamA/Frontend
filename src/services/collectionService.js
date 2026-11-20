@@ -1,13 +1,10 @@
 import { apiRequest } from './api/client'
 import { readDemoCollection } from './demo/workWorkspace'
+import { dataMode } from './config'
 
 export async function getCollection(
   kind,
-  {
-    signal,
-    emptyDemo = false,
-    mode = import.meta.env.VITE_DATA_MODE || 'demo',
-  } = {},
+  { signal, emptyDemo = false, mode = dataMode } = {},
 ) {
   if (!['cards', 'jobs'].includes(kind))
     throw new Error('목록 종류를 확인해 주세요.')

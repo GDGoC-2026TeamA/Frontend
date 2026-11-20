@@ -1,11 +1,9 @@
 import { apiRequest } from './api/client'
 import { getDemoHome } from './demo/home'
+import { dataMode } from './config'
 
 // These API shapes follow the tracker examples; missing values are not demo-filled.
-export async function getHomeDashboard({
-  signal,
-  mode = import.meta.env.VITE_DATA_MODE || 'demo',
-} = {}) {
+export async function getHomeDashboard({ signal, mode = dataMode } = {}) {
   if (mode === 'demo')
     return { ...(await getDemoHome({ signal })), source: 'demo' }
   if (mode !== 'api') throw new Error('지원하지 않는 데이터 모드예요.')

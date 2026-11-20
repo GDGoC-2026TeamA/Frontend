@@ -8,7 +8,7 @@
 
 `ComponentPreviewPage → foundationService.getFoundationPreview() → services/demo/foundation.js → data/foundation.js`
 
-기본 demo 모드에서는 HTTP 요청을 보내지 않습니다. 홈의 `homeService.getHomeDashboard()`는 `VITE_DATA_MODE=api`에서 GET home과 GET jobs를 호출합니다. 실제 업로드나 분석은 아직 연결하지 않았습니다. 조회 실패를 예시 성공으로 대체하지 않습니다.
+기본 모드는 api입니다. 홈의 `homeService.getHomeDashboard()`는 별도 설정 없이 GET home과 GET jobs를 호출합니다. `VITE_DATA_MODE=demo`를 명시한 경우에만 예시 데이터를 씁니다. 실제 업로드나 분석은 백엔드 구현이 필요합니다. 조회 실패를 예시 성공으로 대체하지 않습니다. [현재 배포 서버 상태](SERVER_CONNECTION.md)를 참고하세요.
 
 ## 공통 전송 코드
 
@@ -131,6 +131,6 @@ const disposition = response.headers.get('Content-Disposition')
 - 사용자에게 받은 서버: `https://gdgoc2026a.up.railway.app`
 - 홈 서비스: GET `/api/v1/home`의 tasks/resumeJobs/recentCards와 GET `/api/v1/jobs`의 items를 조합합니다.
 - 2026-11-20 한국 시간에 두 경로를 실제 GET으로 확인했으며 HTTP 404였습니다. 서버 성공 연결을 확인한 상태는 아닙니다.
-- `api` 모드에서는 실패 상태와 다시 시도가 표시됩니다. 기본 `demo` 모드는 서버에 요청하지 않습니다.
+- 기본 `api` 모드에서는 실패 상태와 다시 시도가 표시됩니다. `VITE_DATA_MODE=demo`를 명시한 경우에만 예시 데이터를 씁니다.
 - 홈 검색은 조회한 tasks와 recentCards의 이름을 브라우저에서 찾습니다. 별도 검색 엔드포인트를 만들지 않았습니다.
 - 서버 응답에 learningStatus, 날짜, pending 수, 카드 단계 수가 없으면 미확인 또는 일반 안내를 표시합니다. 예시 업무나 상태를 보충하지 않습니다.

@@ -21,7 +21,8 @@ test.beforeAll(async () => {
       windowsHide: true,
       env: {
         ...process.env,
-        VITE_DATA_MODE: 'api',
+        // Empty mode must use the server, just like a fresh checkout.
+        VITE_DATA_MODE: '',
         VITE_API_BASE_URL: 'https://gdgoc2026a.up.railway.app/api/v1',
       },
       stdio: 'ignore',
@@ -46,6 +47,27 @@ test.beforeAll(async () => {
 })
 test.afterAll(() => {
   server?.kill()
+})
+
+test('default mode has no example account and unconfigured login sends no credentials', async ({
+  page,
+}) => {
+  const writes = []
+  page.on('request', (request) => {
+    if (request.method() === 'POST') writes.push(request.url())
+  })
+  await page.goto(apiURL + '/login')
+  await expect(page.locator('.account-demo-note')).toHaveCount(0)
+  await page.getByLabel('이메일', { exact: false }).fill('test@example.com')
+  await page.getByLabel('비밀번호', { exact: true }).fill('test-password')
+  await page.getByRole('button', { name: '로그인', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('계정 서버 연결')
+  expect(writes).toEqual([])
+  const account = await page.evaluate(async () => {
+    const { demoAccounts } = await import('/src/services/accountService.js')
+    return demoAccounts
+  })
+  expect(account).toBe(false)
 })
 
 test('API home shows loading, 404, retry, empty and server data without demo fallback', async ({

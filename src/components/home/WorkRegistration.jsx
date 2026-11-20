@@ -13,6 +13,7 @@ import {
 import { StatusIcon } from '../ui/StatusIcon'
 import { registrationExample as example } from '../../data/registration'
 import { analyzeRegistrationExample } from '../../services/registrationService'
+import { dataMode } from '../../services/config'
 
 const steps = ['업무 등록', '자료 분석', '비교 내용 확인']
 const descriptions = {
@@ -73,7 +74,7 @@ export function WorkRegistration({
   const [saved, setSaved] = useState(task?.draft || task?.saved || null)
   const controller = useRef(null)
   const heading = useRef(null)
-  const apiMode = import.meta.env.VITE_DATA_MODE === 'api'
+  const apiMode = dataMode !== 'demo'
   useEffect(() => () => controller.current?.abort(), [])
   useEffect(() => {
     heading.current?.focus({ preventScroll: true })
@@ -346,7 +347,7 @@ export function WorkRegistration({
           {apiMode ? (
             <p role="status" className="registration-warning">
               실제 업무 등록과 파일 분석은 아직 연결되지 않았어요. 예시 흐름은
-              기본 demo 모드에서 확인해 주세요.
+              예시 모드를 선택한 뒤 확인해 주세요.
             </p>
           ) : (
             <p className="registration-demo">

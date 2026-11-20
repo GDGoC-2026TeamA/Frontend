@@ -30,6 +30,7 @@ import {
   questionsForTopics,
 } from '../services/learningModel'
 import { loadApiLearningTask } from '../services/learningService'
+import { dataMode } from '../services/config'
 
 const steps = ['바뀐 절차', '상황별 연습', '학습 결과']
 
@@ -47,7 +48,7 @@ export default function LearningRoute() {
 }
 
 function LearningLoader({ taskId, sessionId, search }) {
-  const mode = import.meta.env.VITE_DATA_MODE || 'demo'
+  const mode = dataMode
   const [retry, setRetry] = useState(0)
   const [loaded, setLoaded] = useState(() => {
     const existing = getLearningSession(sessionId)

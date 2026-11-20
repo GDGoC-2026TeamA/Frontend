@@ -1,8 +1,9 @@
 import { apiRequest } from './api/client'
 import { getDemoLearningTask } from './demo/taskWorkspace'
 import { readDemoRecord, renameDemoCard } from './demo/workWorkspace'
+import { dataMode } from './config'
 
-export const workMode = () => import.meta.env.VITE_DATA_MODE || 'demo'
+export const workMode = () => dataMode
 const validId = (value) =>
   typeof value === 'string' || typeof value === 'number'
 export function normalizeWorkFields(fields, missing = []) {
