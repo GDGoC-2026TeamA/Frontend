@@ -1,8 +1,8 @@
 import { NavLink, Link } from 'react-router-dom'
-import homeIcon from '../../assets/icons/home-outline.svg'
+import homeIcon from '../../assets/home/home.svg?no-inline'
 import bookIcon from '../../assets/icons/book-open.png'
-import cardIcon from '../../assets/icons/work-card.svg'
-import clockIcon from '../../assets/icons/history-outline.svg'
+import cardIcon from '../../assets/home/work-card.svg?no-inline'
+import clockIcon from '../../assets/home/history.svg?no-inline'
 
 const items = [
   { to: '/', label: '홈', icon: homeIcon, iconClass: 'sidebar__icon--home' },

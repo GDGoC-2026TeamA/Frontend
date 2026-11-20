@@ -11,8 +11,8 @@ const previewEnabled =
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<HomePage />} />
       <Route element={<AppLayout />}>
-        <Route index element={<HomePage />} />
         <Route
           path="work-cards"
           element={
