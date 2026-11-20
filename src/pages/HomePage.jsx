@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
 import { Header } from '../components/layout/Header'
 import { HomeSearch } from '../components/home/HomeSearch'
@@ -9,11 +9,13 @@ import { WorkTile } from '../components/home/WorkTile'
 import { FileText, ArrowRight } from '../components/ui/DesignIcons'
 import { Badge, Button, Modal, StatePanel } from '../components/ui'
 import { getHomeDashboard } from '../services/homeService'
+import { WorkRegistration } from '../components/home/WorkRegistration'
 import warningDot from '../assets/home/status-warning.svg?no-inline'
 import successDot from '../assets/home/status-success.svg?no-inline'
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [retry, setRetry] = useState(0)
@@ -172,6 +174,9 @@ export default function HomePage() {
                 </div>
               </section>
             </>
+          )}
+          {location.pathname === '/work/new' && (
+            <WorkRegistration onClose={() => navigate('/')} />
           )}
           <HomeOnboarding open={tour} onClose={() => setTour(false)} />
           <Modal
