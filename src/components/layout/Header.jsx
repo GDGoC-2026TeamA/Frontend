@@ -25,6 +25,7 @@ export function Header({
   variant = 'work',
   title,
   description,
+  search,
 }) {
   if (variant === 'home')
     return (
@@ -39,7 +40,7 @@ export function Header({
             <Menu size={22} aria-hidden="true" />
           </Button>
           <PageHeader title={title} variant="home" />
-          <SearchField variant="home" />
+          {search || <SearchField variant="home" />}
         </div>
         {description && <p className="text-secondary">{description}</p>}
       </header>

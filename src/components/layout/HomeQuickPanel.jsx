@@ -1,4 +1,4 @@
-// Layout slots only. Work lists and assistant actions belong to the next phase.
+// Shared right column; home content is supplied by the page.
 export function HomeQuickPanel({ children }) {
   return (
     <aside className="home-quick-panel" aria-label="빠른 확인">

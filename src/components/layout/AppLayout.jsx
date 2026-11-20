@@ -14,7 +14,7 @@ function locationLabel(pathname) {
   return '페이지 안내'
 }
 
-export function AppLayout({ children, assistant, homeAside }) {
+export function AppLayout({ children, assistant, homeAside, onHomeHelp }) {
   const location = useLocation()
   const isHome = location.pathname === '/'
   const [help, setHelp] = useState(false)
@@ -33,7 +33,7 @@ export function AppLayout({ children, assistant, homeAside }) {
         <aside className="sidebar">
           <Sidebar
             variant={isHome ? 'home' : 'work'}
-            onHelp={() => setHelp(true)}
+            onHelp={onHomeHelp || (() => setHelp(true))}
           />
         </aside>
         <div className="app-layout__workspace">
@@ -47,7 +47,9 @@ export function AppLayout({ children, assistant, homeAside }) {
             className={`app-layout__body ${assistant ? 'has-assistant' : ''}`}
           >
             <main id="main-content" className="main-content" tabIndex={-1}>
-              {children || (
+              {(typeof children === 'function'
+                ? children({ openMenu: () => setMenu(true) })
+                : children) || (
                 <Outlet context={{ openMenu: () => setMenu(true) }} />
               )}
             </main>
@@ -70,7 +72,8 @@ export function AppLayout({ children, assistant, homeAside }) {
           onNavigate={() => setMenu(false)}
           onHelp={() => {
             setMenu(false)
-            setHelp(true)
+            if (onHomeHelp) onHomeHelp()
+            else setHelp(true)
           }}
         />
       </Drawer>

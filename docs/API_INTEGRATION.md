@@ -8,11 +8,11 @@
 
 `ComponentPreviewPage → foundationService.getFoundationPreview() → services/demo/foundation.js → data/foundation.js`
 
-화면에서는 HTTP 요청을 보내지 않습니다. `VITE_DATA_MODE=demo`만 지원하며 다른 모드는 미연결 오류를 표시합니다. API client 개선만으로 실제 업로드나 분석이 켜지지 않습니다.
+기본 demo 모드에서는 HTTP 요청을 보내지 않습니다. 홈의 `homeService.getHomeDashboard()`는 `VITE_DATA_MODE=api`에서 GET home과 GET jobs를 호출합니다. 실제 업로드나 분석은 아직 연결하지 않았습니다. 조회 실패를 예시 성공으로 대체하지 않습니다.
 
 ## 공통 전송 코드
 
-업무별 서비스에서 `src/services/api/client.js`의 `apiRequest()`를 호출합니다. 기본 URL은 `/api/v1`이며 `VITE_API_BASE_URL`로 바꿉니다. 예: `https://backend.example.com/api/v1`. 서비스에서는 `home`, `tasks/1/materials`처럼 **접두사를 뺀 리소스 경로**를 넘깁니다. 표의 전체 경로를 그대로 넘겨 /api/v1이 중복되지 않게 하세요. 현재 개발 서버에는 API 프록시가 없습니다. 실제 연결에는 서버 주소 또는 DevOps의 프록시와 CORS 설정이 필요합니다.
+업무별 서비스에서 `src/services/api/client.js`의 `apiRequest()`를 호출합니다. 기본 URL은 `https://gdgoc2026a.up.railway.app/api/v1`이며 `VITE_API_BASE_URL`로 바꿉니다. 예: `https://backend.example.com/api/v1`. 서비스에서는 `home`, `tasks/1/materials`처럼 **접두사를 뺀 리소스 경로**를 넘깁니다. 표의 전체 경로를 그대로 넘겨 /api/v1이 중복되지 않게 하세요. 현재 개발 서버에는 API 프록시가 없습니다. 실제 연결에는 서버 주소 또는 DevOps의 프록시와 CORS 설정이 필요합니다.
 
 - 기본은 JSON 전송입니다. body를 생략하면 요청 본문과 Content-Type을 보내지 않습니다.
 - FormData는 그대로 보냅니다. multipart boundary가 필요하므로 Content-Type은 브라우저가 정합니다.
@@ -124,4 +124,13 @@ const disposition = response.headers.get('Content-Disposition')
 
 ## 추가로 확인할 계약
 
-인증과 접근 권한, 실제 호스트/CORS, 공통 오류 구조, 자료 kind 전체 값과 업로드 제한, 페이지네이션, 필드 필수/선택 여부, 상태 전체 값, AI 비동기 처리와 재시도, 근거 인용문과 원본 위치, 다운로드 파일명 인코딩을 합의해야 합니다. 성공 응답 예시만으로 완료 상태나 분석 정확성을 보장하지 않습니다. 실제 연결 실패를 예시 성공으로 바꾸지 않습니다.
+인증과 접근 권한, CORS, 공통 오류 구조, 자료 kind 전체 값과 업로드 제한, 페이지네이션, 필드 필수/선택 여부, 상태 전체 값, AI 비동기 처리와 재시도, 근거 인용문과 원본 위치, 다운로드 파일명 인코딩을 합의해야 합니다. 성공 응답 예시만으로 완료 상태나 분석 정확성을 보장하지 않습니다. 실제 연결 실패를 예시 성공으로 바꾸지 않습니다.
+
+## 홈 화면 연결 상태
+
+- 사용자에게 받은 서버: `https://gdgoc2026a.up.railway.app`
+- 홈 서비스: GET `/api/v1/home`의 tasks/resumeJobs/recentCards와 GET `/api/v1/jobs`의 items를 조합합니다.
+- 2026-11-20 한국 시간에 두 경로를 실제 GET으로 확인했으며 HTTP 404였습니다. 서버 성공 연결을 확인한 상태는 아닙니다.
+- `api` 모드에서는 실패 상태와 다시 시도가 표시됩니다. 기본 `demo` 모드는 서버에 요청하지 않습니다.
+- 홈 검색은 조회한 tasks와 recentCards의 이름을 브라우저에서 찾습니다. 별도 검색 엔드포인트를 만들지 않았습니다.
+- 서버 응답에 learningStatus, 날짜, pending 수, 카드 단계 수가 없으면 미확인 또는 일반 안내를 표시합니다. 예시 업무나 상태를 보충하지 않습니다.

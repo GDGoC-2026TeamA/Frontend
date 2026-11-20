@@ -6,10 +6,14 @@ const labels = {
   success: '확인 완료',
   error: '오류',
 }
-export function Badge({ tone = 'neutral', children, className = '' }) {
+export function Badge({ tone = 'neutral', children, dotIcon, className = '' }) {
   return (
     <span className={`badge badge--${tone} ${className}`}>
-      <span className="badge__dot" aria-hidden="true" />
+      {dotIcon ? (
+        <img src={dotIcon} alt="" />
+      ) : (
+        <span className="badge__dot" aria-hidden="true" />
+      )}
       {children || labels[tone]}
     </span>
   )

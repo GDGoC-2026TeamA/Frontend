@@ -8,6 +8,7 @@ import './styles/ui.css'
 import './styles/layout.css'
 import './styles/pages.css'
 import './styles/home-layout.css'
+import './styles/home-dashboard.css'
 import App from './App.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
