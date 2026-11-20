@@ -66,7 +66,12 @@ Figma ‘2차 / 홈, 업무 등록과 자료 비교’의 02~07 화면을 구현
 실제 파일 분석, 서버 쓰기와 배포는 포함하지 않습니다.`
 
 async function main() {
-  if (git('status', '--porcelain'))
+  const pending = git('status', '--porcelain', '--untracked-files=all')
+    .split('\n')
+    .filter(Boolean)
+  const generatedScreenshot =
+    /^[ ?MADRCU!]+\s+docs\/screenshots\/registration-(compare|edit|revised|mobile|empty)\.png$/
+  if (pending.some((line) => !generatedScreenshot.test(line)))
     throw new Error(
       '커밋하지 않은 변경이 있어요. 변경을 보존하고 먼저 확인해 주세요.',
     )
