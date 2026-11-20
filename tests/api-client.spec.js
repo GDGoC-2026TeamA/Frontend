@@ -1,5 +1,16 @@
 import { test, expect } from '@playwright/test'
 
+// Test the transport module in an inert document so Vite's application dependency
+// optimization and HMR cannot navigate away during page.evaluate().
+test.beforeEach(async ({ page }) => {
+  await page.route('**/__transport-test', (route) =>
+    route.fulfill({
+      contentType: 'text/html',
+      body: '<!doctype html><html lang="en"><head><title>Transport test</title></head><body></body></html>',
+    }),
+  )
+})
+
 test('API prefix, JSON request, and body-free result save', async ({
   page,
 }) => {
@@ -12,7 +23,7 @@ test('API prefix, JSON request, and body-free result save', async ({
     })
     await route.fulfill({ json: { jobId: 61, status: '결과 저장됨' } })
   })
-  await page.goto('/')
+  await page.goto('/__transport-test')
   const result = await page.evaluate(async () => {
     const { apiRequest } = await import('/src/services/api/client.js')
     await apiRequest('jobs/61/draft', {
@@ -44,7 +55,7 @@ test('multipart sends file bytes and browser boundary for both material types', 
     })
     await route.fulfill({ json: { id: 11 } })
   })
-  await page.goto('/')
+  await page.goto('/__transport-test')
   await page.evaluate(async () => {
     const { apiRequest } = await import('/src/services/api/client.js')
     for (const [path, kind] of [
@@ -92,7 +103,7 @@ test('download preserves bytes and filename header; DELETE 204 returns null', as
   await page.route('**/api/v1/job-files/71', (route) =>
     route.fulfill({ status: 204 }),
   )
-  await page.goto('/')
+  await page.goto('/__transport-test')
   const result = await page.evaluate(async () => {
     const { apiRequest } = await import('/src/services/api/client.js')
     const response = await apiRequest('jobs/61/result/download', {
@@ -115,7 +126,7 @@ test('HTTP errors and cancellation stay failures without demo fallback', async (
   await page.route('**/api/v1/analyses/20', (route) =>
     route.fulfill({ status: 503, body: 'Unavailable' }),
   )
-  await page.goto('/')
+  await page.goto('/__transport-test')
   const result = await page.evaluate(async () => {
     const { apiRequest } = await import('/src/services/api/client.js')
     let failed, cancelled
