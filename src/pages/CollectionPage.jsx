@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
 import { Header } from '../components/layout/Header'
-import { Button, StatePanel } from '../components/ui'
+import { Button, Input, StatePanel } from '../components/ui'
 import { StatusIcon } from '../components/ui/StatusIcon'
 import { getCollection } from '../services/collectionService'
 
@@ -38,9 +38,12 @@ export default function CollectionPage({ kind }) {
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [retry, setRetry] = useState(0)
+  const [searchParams] = useSearchParams()
+  const emptyDemo = searchParams.get('empty') === '1'
+  const [query, setQuery] = useState('')
   useEffect(() => {
     const controller = new AbortController()
-    getCollection(kind, { signal: controller.signal })
+    getCollection(kind, { signal: controller.signal, emptyDemo })
       .then((value) => {
         if (!controller.signal.aborted) setResult(value)
       })
@@ -48,7 +51,7 @@ export default function CollectionPage({ kind }) {
         if (!controller.signal.aborted) setError(reason)
       })
     return () => controller.abort()
-  }, [kind, retry])
+  }, [kind, retry, emptyDemo])
   return (
     <AppLayout
       variant="home"
@@ -97,19 +100,54 @@ export default function CollectionPage({ kind }) {
             </section>
           ) : (
             <section className="collection-records" aria-label={content.title}>
-              {result.items.map((item, index) => (
-                <article key={item.id ?? index}>
-                  <h2>{item.title || item.name || '이름 미확인'}</h2>
-                  {item.status && <p>{item.status}</p>}
-                  <p>상세 화면은 다음 차수에서 연결해요.</p>
-                </article>
-              ))}
+              <Input
+                label={kind === 'cards' ? '카드 검색' : '작업 검색'}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                type="search"
+              />
+              {result.items
+                .filter((item) =>
+                  (item.title || item.name || '')
+                    .toLocaleLowerCase()
+                    .includes(query.trim().toLocaleLowerCase()),
+                )
+                .map((item, index) => (
+                  <article key={item.id ?? index}>
+                    <h2>{item.title || item.name || '이름 미확인'}</h2>
+                    {item.status && <p>{item.status}</p>}
+                    <Link
+                      to={
+                        kind === 'cards'
+                          ? `/work-cards/${encodeURIComponent(item.id)}`
+                          : `/jobs/${encodeURIComponent(item.id)}`
+                      }
+                    >
+                      {kind === 'cards'
+                        ? '절차 보기'
+                        : item.status === '결과 저장됨'
+                          ? '결과 보기'
+                          : '검토 이어하기'}
+                    </Link>
+                  </article>
+                ))}
+              {!result.items.some((item) =>
+                (item.title || item.name || '')
+                  .toLocaleLowerCase()
+                  .includes(query.trim().toLocaleLowerCase()),
+              ) && (
+                <StatePanel
+                  title="검색 결과가 없어요"
+                  actionLabel="검색어 지우기"
+                  onAction={() => setQuery('')}
+                />
+              )}
             </section>
           )}
           {result?.source === 'demo' && (
             <p className="collection-demo">
-              예시 모드의 빈 목록이에요. 실제 저장 내역을 조회한 결과가
-              아니에요.
+              예시 목록과 이 탭에서 저장한 기록이에요. 실제 서버의 저장 내역이
+              아니며 새로고침하면 예시 목록으로 돌아가요.
             </p>
           )}
         </div>

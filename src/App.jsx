@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
 import HomePage from './pages/HomePage'
 import LearningRoute from './pages/LearningPage'
+import TaskDetailPage from './pages/TaskDetailPage'
+import WorkCardPage from './pages/WorkCardPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import CollectionPage from './pages/CollectionPage'
 import WorkInputPage from './pages/WorkInputPage'
@@ -17,6 +19,9 @@ export default function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="work/new" element={<HomePage />} />
       <Route path="tasks" element={<HomePage />} />
+      <Route path="tasks/:taskId" element={<TaskDetailPage />} />
+      <Route path="jobs/:jobId" element={<WorkInputPage />} />
+      <Route path="work-cards/:cardId" element={<WorkCardPage />} />
       <Route path="learn/:taskId" element={<LearningRoute />} />
       <Route
         path="work-cards"
