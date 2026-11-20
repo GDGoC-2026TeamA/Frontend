@@ -1,1 +1,161 @@
-# Frontend
+# WORK BRIDGE
+
+기존 업무 자료와 새 시스템 매뉴얼을 비교해 바뀐 절차를 배우고, 오늘의 작업 자료를 검토하는 웹 서비스입니다. 재고 입고 기록이 대표 시나리오이며 예약 접수는 같은 구조의 확장 예시입니다.
+
+현재 버전은 **1차: React + Vite 기반과 공통 UI**입니다. 홈 대시보드 전체나 실제 업무 흐름은 아직 구현하지 않았습니다.
+
+## 설치와 실행
+
+Node.js 24 이상과 npm이 필요합니다. 이 프로젝트는 JavaScript, JSX와 CSS를 씁니다.
+
+```bash
+npm ci
+npm run dev
+```
+
+터미널에 표시되는 주소를 여세요. 기본 주소는 `http://127.0.0.1:5173`입니다. 포트가 사용 중이면 Vite가 다른 포트를 안내합니다.
+
+개발용 컴포넌트 화면은 **`http://127.0.0.1:5173/dev/components`**에서 엽니다. 주요 메뉴에는 이 화면을 넣지 않았습니다.
+
+`.env` 파일 없이도 예시 모드로 실행됩니다. 환경 설정이 필요하면 `.env.example`을 `.env.local`로 복사하세요. `VITE_*` 값은 브라우저에 공개되므로 비밀 키를 넣으면 안 됩니다.
+
+## 빌드와 점검
+
+```bash
+npm run lint
+npm run build
+npm run preview
+```
+
+빌드 결과는 `dist/`에 생깁니다. 미리보기 기본 주소는 `http://127.0.0.1:4173`입니다. 배포 설정과 실제 배포는 DevOps 담당 범위입니다. BrowserRouter를 쓰므로 배포 서버에서는 `/work-cards` 같은 직접 접근 주소를 `index.html`로 연결해야 합니다. 하위 경로에 배포한다면 Vite의 `base`와 Router의 `basename`도 함께 설정하세요.
+
+컴포넌트 확인 화면은 기본 프로덕션 빌드에서 열리지 않습니다. 팀 검토용 빌드에 넣으려면 `.env.local`에 `VITE_ENABLE_COMPONENT_PREVIEW=true`를 적고 다시 빌드하세요. 일반 화면의 메뉴는 바뀌지 않습니다.
+
+```bash
+npm run test:e2e
+```
+
+브라우저 점검은 Playwright로 합니다. Windows에서는 설치된 Microsoft Edge나 Chrome의 기본 경로를 확인해 씁니다. 다른 환경에서는 `npx playwright install chromium`을 먼저 실행하세요. `PLAYWRIGHT_EXECUTABLE_PATH` 환경 변수로 브라우저 실행 파일을 지정할 수도 있습니다. 검사 시 5173 포트를 씁니다. 같은 개발 서버가 열려 있으면 재사용합니다. 검사 결과와 스크린샷은 `test-results/`에 생기며 Git에 올리지 않습니다.
+
+코드 정렬: `npx prettier --write .`
+
+## 1차 구현 완료 항목
+
+- React + Vite 프로젝트, 설치 잠금 파일과 ESLint 설정
+- AppLayout, Sidebar, Header, PageHeader, 본문과 AI 패널 슬롯
+- A 시안의 240px 메뉴, 72px 상단 바, 도움말과 작업 공간 표시
+- CSS 변수로 정리한 색상, 글자, 간격, 모서리, 그림자
+- Button, Input, Textarea, Checkbox, Badge, Card
+- Tabs와 Stepper, Modal과 Drawer, FileUpload
+- 빈 화면, 로딩, 오류, 자료 부족 안내
+- 개발용 컴포넌트 확인 화면과 주요 메뉴의 기본 페이지 틀
+- 예시 데이터, 예시 응답 로직과 API 전송 코드 분리
+- 작은 화면의 메뉴 Drawer, 반응형 배치, 키보드 조작과 포커스 표시
+- 모달 포커스 유지와 복귀, Escape와 배경 클릭 닫기
+- 파일 형식과 크기 검사, 선택, 교체, 삭제, 끌어놓기
+- 이후 AI 질문 화면에서 쓸 AssistantPanel과 EvidenceCard 구조
+
+버튼의 기본, 호버, 포커스, 비활성, 처리 중 상태와 입력란의 오류, 읽기 전용 상태를 확인할 수 있습니다. 호버와 포커스는 실제 CSS 동작이며 확인 화면에는 비교를 위한 고정 예시도 있습니다.
+
+## 화면 주소와 현재 범위
+
+| 주소              | 현재 내용                                       | 다음 작업                 |
+| ----------------- | ----------------------------------------------- | ------------------------- |
+| `/`               | A 시안의 메뉴와 상단 바, 페이지 제목, 준비 안내 | 2차 홈 대시보드           |
+| `/work/new`       | 업무 등록 페이지 틀과 미연결 안내               | 2차 업무 등록과 자료 비교 |
+| `/work-cards`     | 개인 업무 카드 페이지 틀                        | 4차 카드 저장과 조회      |
+| `/history`        | 작업 내역 페이지 틀                             | 4차 작업 결과와 조회      |
+| `/dev/components` | 공통 컴포넌트와 상태 확인                       | 개발 중 계속 확인         |
+| 그 밖의 주소      | 주소 오류 안내와 홈 이동                        | 필요한 화면을 차례로 추가 |
+
+상단 검색은 형태만 만들었으며 비활성 상태입니다. 홈 본문의 이어서 할 작업, 등록 업무 카드, 최근 작업, 오른쪽 개인 업무 카드 목록은 2차에 만듭니다.
+
+## 예시 데이터와 실제 기능
+
+- `src/data/foundation.js`의 가상 매뉴얼만 예시 응답으로 보여 줍니다. 사용자가 고른 파일에서 추출한 내용이 아닙니다.
+- 파일 선택 컴포넌트는 브라우저의 File 객체만 잠시 보관합니다. 파일 바이트를 읽거나 서버에 보내지 않습니다. 자동 업로드, 문서 추출과 AI 분석은 없습니다.
+- 파일 형식과 파일당 최대 10MB 제한은 **프런트엔드 데모 기준**입니다. 실제 업로드 제한은 백엔드와 협의해야 합니다. 이 검사는 서버 검증을 대신하지 않습니다.
+- 입력값, 체크 상태와 파일 선택은 React 메모리 상태입니다. 새로고침하면 사라집니다. 이번 버전은 localStorage, IndexedDB, 쿠키로 업무 데이터를 저장하지 않습니다. 이후 브라우저 저장을 붙이면 데모용 임시 저장임을 별도로 표시해야 합니다.
+- 정상, 오류, 자료 부족 예시는 600ms 뒤 고정 응답으로 바뀝니다. 실제 AI나 서버에 요청하지 않습니다.
+- `VITE_DATA_MODE=demo`만 지원합니다. 다른 값을 넣으면 실제 연결이 없다는 오류를 보여 주며 예시 결과로 조용히 대체하지 않습니다.
+- ‘확인 완료’는 사용자가 확인했다는 상태입니다. AI 결과의 정확성을 보증하지 않습니다.
+- 업무 기준 자료는 기존 양식과 새 매뉴얼, 작업 자료는 이번에 받은 내역입니다. 개인 업무 카드는 처리 절차, 작업 결과는 이번에 검토하고 수정한 내용입니다.
+- 서비스 내부 저장과 외부 시스템 등록은 구분합니다. 외부 재고 시스템 등록, 예약 확정과 주문 전송은 구현 범위에 없습니다.
+
+## 폴더 구조
+
+```text
+src/
+  App.jsx
+  main.jsx
+  assets/icons/          피그마에서 내보낸 메뉴 아이콘
+  components/
+    layout/              공통 레이아웃, 메뉴, 상단 바, AI 패널 틀
+    ui/                  재사용 UI와 상태 안내
+  pages/                 페이지 조합과 화면 상태
+  data/                  가상 매뉴얼 등 표시용 예시
+  services/
+    foundationService.js 예시 모드 진입점
+    demo/                지연과 오류를 포함한 고정 예시 응답
+    api/client.js        향후 실제 API 전송을 맡을 공통 함수
+  styles/
+    tokens.css           디자인 토큰
+    global.css           기본 글자와 공통 접근성 스타일
+    ui.css               공통 UI
+    layout.css           메뉴, 상단 바와 본문 배치
+    pages.css            확인용 화면 등 페이지별 배치
+tests/                   메뉴, 컴포넌트와 접근성 브라우저 점검
+docs/API_INTEGRATION.md   백엔드 연결 제안과 경계
+```
+
+Noto Sans KR은 `@fontsource-variable/noto-sans-kr` 패키지로 번들에 포함합니다. 실행 중 외부 폰트 서버를 호출하지 않습니다. 메뉴 아이콘은 Figma 원본에서 내보낸 PNG와 SVG이며 다른 조작 아이콘은 `lucide-react`를 씁니다. 로고는 A 시안의 W 표시와 텍스트로 구현했습니다. 화면 전체를 이미지로 넣지 않았습니다. 출처는 `src/assets/README.md`에 적었습니다.
+
+## 디자인 기준
+
+- [확정 A 시안](https://www.figma.com/design/wX9g6gKuJztvTMWGIhtr9j/?node-id=11-2)
+- [디자인 시스템 시작 프레임](https://www.figma.com/design/wX9g6gKuJztvTMWGIhtr9j/?node-id=15-2)
+- 공통 컴포넌트: 같은 파일의 `03 · Components`
+
+피그마는 읽기 전용으로 확인했습니다. B와 C 시안의 레이아웃은 섞지 않았습니다. 데스크톱에서는 A 시안 치수를 따르고 작은 화면에서는 메뉴를 접고 본문을 한 열로 배치합니다. 일부 Figma 성공 배경은 `#ECFDF5`였으나 전달받은 확정 명세에 맞춰 `#F0FDF4`를 썼습니다.
+
+## 실제 API 연결 위치
+
+화면에서 직접 fetch를 호출하지 않습니다. 이후 `src/services/`에 업무별 서비스 함수를 만들고 `src/services/api/client.js`를 통해 요청하세요. 현재 client 함수는 어느 화면에서도 호출하지 않습니다. API 주소와 인증 방식은 확정 전입니다.
+
+`analyzeMaterials()` 등의 이름과 요청, 응답 구조는 **백엔드와 합의하지 않은 제안안**입니다. 아직 쓰지 않는 빈 함수를 만들지 않았습니다. [API 연결 설명](docs/API_INTEGRATION.md)을 기준으로 다음 차수에서 실제 쓰는 함수부터 추가하세요.
+
+`AppLayout`의 `assistant` prop에 패널을 넘기면 본문 옆의 360px 영역에 배치할 수 있습니다. 화면 폭이 좁아지면 본문 아래로 옮겨집니다. Drawer로 띄울 때는 `AssistantPanel`을 자식으로 넘기세요. 실제 질문 입력과 대화 기록은 3차 작업입니다.
+
+## 다음 차수
+
+| 차수 | 추가할 내용                                                                |
+| ---- | -------------------------------------------------------------------------- |
+| 2차  | A 시안 홈 본문, 새 업무 등록, 예시 분석과 업무 비교                        |
+| 3차  | 새 방식 익히기, 상황별 연습, 피드백, AI 질문과 근거 패널                   |
+| 4차  | 작업 자료 입력, 초안 검토와 수정, 결과 내려받기, 개인 업무 카드, 작업 내역 |
+| 최종 | 전체 전환과 상태 점검, README와 API 설명 갱신                              |
+
+같은 프로젝트에 화면을 추가합니다. 공통 UI는 `src/components/ui`, 디자인 값은 `tokens.css`에서 바꾸세요.
+
+## GitHub 전달
+
+작업 저장소는 [GDGoC-2026TeamA/Frontend](https://github.com/GDGoC-2026TeamA/Frontend)이며 원격 이름은 `origin`입니다. 1차 코드의 작업 브랜치는 `feat/work-bridge-phase1`입니다. 기존 `main`의 커밋을 부모로 삼아 팀원이 검토한 뒤 병합할 수 있도록 구성합니다.
+
+이번 코드는 최초 A 시안을 기준으로 만든 1차 기반입니다. 이후 변경된 디자인 시스템과 홈 리디자인은 변경 사항을 전달받은 뒤 반영합니다.
+
+현재 실행 환경은 작업 폴더의 `.git` 쓰기를 제한합니다. 소스는 현재 폴더 하나에 두고 Git 기록만 쓰기가 허용된 `C:/workspace/work-bridge-git`에 만들었습니다. 이 환경에서 상태를 보려면 프로젝트 폴더에서 다음 명령을 쓰세요.
+
+```bash
+git --git-dir=C:/workspace/work-bridge-git --work-tree=. status
+```
+
+다른 컴퓨터에서는 업로드된 작업 브랜치를 복제해 같은 프로젝트를 이어 가세요. 일반 환경에서는 별도 Git 경로 옵션이 필요하지 않습니다.
+
+```bash
+git clone --branch feat/work-bridge-phase1 https://github.com/GDGoC-2026TeamA/Frontend.git work-bridge
+cd work-bridge
+npm ci
+npm run dev
+```
+
+`node_modules/`, `dist/`, `.env*` 비밀 설정, 검사 산출물은 제외합니다. 소스, 로컬 아이콘, 설정 파일, `package-lock.json`, README와 API 설명을 올립니다. `.env.example`에는 공개 가능한 예시 설정만 넣었습니다. 이전에 전달한 ZIP과 bundle은 최초 로컬 1차 커밋의 보관본입니다.

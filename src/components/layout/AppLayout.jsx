@@ -1,0 +1,94 @@
+import { useEffect, useState } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
+import { Sidebar } from './Sidebar'
+import { Header } from './Header'
+import { Modal, Drawer, Button } from '../ui'
+
+function locationLabel(pathname) {
+  if (pathname === '/') return '홈'
+  if (pathname === '/work-cards') return '개인 업무 카드'
+  if (pathname === '/history') return '작업 내역'
+  if (pathname === '/work/new') return '새 업무 등록'
+  if (pathname === '/dev/components') return '컴포넌트 확인'
+  return '페이지 안내'
+}
+
+export function AppLayout({ children, assistant }) {
+  const location = useLocation()
+  const [help, setHelp] = useState(false)
+  const [menu, setMenu] = useState(false)
+  useEffect(() => {
+    document.title = `${locationLabel(location.pathname)} | WORK BRIDGE`
+    document.getElementById('page-title')?.focus({ preventScroll: true })
+    window.scrollTo({ top: 0 })
+  }, [location.pathname])
+  return (
+    <div className="app-layout">
+      <a href="#main-content" className="skip-link">
+        본문으로 바로가기
+      </a>
+      <aside className="sidebar">
+        <Sidebar onHelp={() => setHelp(true)} />
+      </aside>
+      <div className="app-layout__workspace">
+        <Header
+          locationLabel={locationLabel(location.pathname)}
+          onMenu={() => setMenu(true)}
+        />
+        <div className={`app-layout__body ${assistant ? 'has-assistant' : ''}`}>
+          <main id="main-content" className="main-content" tabIndex={-1}>
+            {children || <Outlet />}
+          </main>
+          {assistant && (
+            <div className="app-layout__assistant">{assistant}</div>
+          )}
+        </div>
+      </div>
+      <Drawer
+        open={menu}
+        onClose={() => setMenu(false)}
+        title="워크스페이스 메뉴"
+        className="mobile-nav"
+      >
+        <Sidebar
+          mobile
+          onNavigate={() => setMenu(false)}
+          onHelp={() => {
+            setMenu(false)
+            setHelp(true)
+          }}
+        />
+      </Drawer>
+      <Modal
+        open={help}
+        onClose={() => setHelp(false)}
+        title="WORK BRIDGE 사용 방법"
+        footer={<Button onClick={() => setHelp(false)}>확인했어요</Button>}
+      >
+        <div className="stack help-content">
+          <div>
+            <h3>새 방식 익히기</h3>
+            <p>
+              기존 양식과 새 매뉴얼을 비교하고, 바뀐 절차를 연습해요. 다음에
+              참고할 순서는 개인 업무 카드로 남겨요.
+            </p>
+          </div>
+          <div>
+            <h3>업무 처리하기</h3>
+            <p>
+              등록된 업무를 선택하고 오늘 처리할 자료를 입력해요. 초안을 원본과
+              대조하고 수정한 뒤 작업 결과를 저장해요.
+            </p>
+          </div>
+          <p className="help-content__note">
+            WORK BRIDGE에서 결과를 저장해도 외부 재고 시스템 등록이나 예약
+            확정은 끝나지 않아요.
+          </p>
+          <p className="text-muted">
+            현재는 예시 데이터로 화면을 확인하는 단계예요.
+          </p>
+        </div>
+      </Modal>
+    </div>
+  )
+}
