@@ -15,7 +15,9 @@ export async function apiRequest(
 ) {
   if (!['json', 'response'].includes(responseType))
     throw new TypeError('지원하지 않는 응답 형식입니다.')
-  const base = import.meta.env.VITE_API_BASE_URL || '/api/v1'
+  const base =
+    import.meta.env.VITE_API_BASE_URL ||
+    'https://gdgoc2026a.up.railway.app/api/v1'
   const isForm = body instanceof FormData
   const headers = {
     Accept: responseType === 'response' ? '*/*' : 'application/json',
