@@ -1,0 +1,255 @@
+/* Figma 112:553: registration, comparison and unresolved questions. */
+.registration-modal {
+  width: min(840px, calc(100vw - 32px));
+  border: 0;
+  border-radius: 20px;
+}
+.registration-modal--wide {
+  width: min(1120px, calc(100vw - 32px));
+}
+.registration-modal .overlay__inner {
+  padding: 28px 40px;
+  gap: 20px;
+}
+.registration-modal--wide .overlay__inner {
+  padding: 32px;
+  gap: 14px;
+}
+.registration-modal .overlay__header {
+  min-height: 44px;
+}
+.registration-modal .overlay__header h2 {
+  font-size: 20px;
+  line-height: 30px;
+}
+.registration-modal .overlay__header .button {
+  color: var(--wb-color-primary);
+}
+.registration-modal .overlay__footer {
+  justify-content: space-between;
+  padding-top: 0;
+}
+.registration-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.registration-description {
+  color: var(--wb-color-secondary);
+  line-height: 26px;
+  outline: none;
+}
+.registration-stack > .stepper {
+  margin: 4px 0 8px;
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+.registration-stack > .stepper .stepper__step {
+  flex: 1;
+  font-size: 14px;
+}
+.registration-stack h3 {
+  font-size: 18px;
+  line-height: 28px;
+}
+.registration-stack h4 {
+  font-size: 14px;
+  line-height: 24px;
+}
+.registration-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.registration-demo {
+  color: var(--wb-color-muted);
+  font-size: 12px;
+  line-height: 20px;
+}
+.registration-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: #f5f7fa;
+  margin-top: 8px;
+}
+.registration-file > span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.registration-file strong,
+.registration-file small {
+  display: block;
+}
+.registration-file small {
+  font-size: 12px;
+  color: var(--wb-color-muted);
+  margin-top: 4px;
+}
+.registration-comparison {
+  display: grid;
+  grid-template-columns: minmax(0, 712fr) minmax(0, 312fr);
+  gap: 32px;
+}
+.registration-comparison p {
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.registration-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.registration-card {
+  border: 1px solid var(--wb-color-border);
+  border-radius: 16px;
+  padding: 20px;
+}
+.registration-card h4 {
+  margin-bottom: 8px;
+}
+.registration-card small {
+  color: var(--wb-color-muted);
+  font-size: 13px;
+}
+.registration-card .registration-fields {
+  gap: 12px;
+}
+.registration-card .registration-fields p {
+  margin-top: 4px;
+}
+.registration-warning {
+  border: 1px solid #f59e0b;
+  background: #fff7e8;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.registration-warning .field {
+  width: 100%;
+}
+.registration-warning .field__control {
+  border-color: #f59e0b;
+}
+.registration-confirmed {
+  padding: 12px;
+  border-radius: 12px;
+  background: #eefbf5;
+  width: 100%;
+}
+.registration-confirmed p {
+  margin-top: 8px;
+}
+.registration-pending {
+  width: 100%;
+  background: #fffbef;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 12px;
+}
+.registration-pending p {
+  margin-top: 10px;
+}
+.registration-unknown {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.registration-unknown > svg {
+  flex-shrink: 0;
+  color: #a34b0a;
+}
+.registration-unknown > div {
+  flex: 1;
+}
+.registration-unknown > .button {
+  flex-shrink: 0;
+}
+.registration-evidence {
+  padding: 16px;
+  border-radius: 16px;
+  background: #eff6ff;
+}
+.registration-evidence h3 {
+  margin: 12px 0;
+}
+.registration-evidence p,
+.registration-note p {
+  color: var(--wb-color-secondary);
+  margin-top: 8px;
+}
+.registration-note {
+  padding: 16px;
+  border-radius: 14px;
+  background: #f5f7fa;
+}
+.registration-loading {
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #eff6ff;
+  border-radius: 16px;
+  text-align: center;
+}
+.registration-loading > svg {
+  color: var(--wb-color-primary);
+}
+.registration-error {
+  border-left: 3px solid #dc2626;
+  background: #fff1f2;
+  padding: 12px;
+  color: #991b1b;
+}
+@media (max-width: 760px) {
+  .registration-modal .overlay__inner {
+    padding: 20px;
+  }
+  .registration-comparison,
+  .registration-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .registration-stack > .stepper {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .registration-stack > .stepper .stepper__step {
+    gap: 6px;
+    font-size: 11px;
+    align-items: flex-start;
+  }
+  .registration-stack > .stepper .stepper__number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+  }
+  .registration-warning,
+  .registration-card {
+    padding: 14px;
+  }
+  .registration-unknown {
+    flex-wrap: wrap;
+  }
+  .registration-unknown > div {
+    min-width: 120px;
+  }
+  .registration-unknown > .button {
+    margin-left: auto;
+  }
+  .registration-file {
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+}
