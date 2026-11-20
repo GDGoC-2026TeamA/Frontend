@@ -73,7 +73,7 @@ test('recipient baseline is read-only and retains outstanding questions and refe
   const more = page.getByRole('button', { name: '재고 입고 기록 더 보기' })
   await more.click()
   await page
-    .getByRole('button', { name: '공유 업무 확인', exact: true })
+    .getByRole('button', { name: '업무 정보 보기', exact: true })
     .click()
   const dialog = page.getByRole('dialog', { name: '공유 업무 확인' })
   await expect(dialog).toContainText('김민수')
@@ -115,7 +115,7 @@ test('private task saves only in the demo tab, reopens edited text and never off
     .click()
   await page.getByRole('button', { name: '재고 입고 기록 더 보기' }).click()
   await page
-    .getByRole('button', { name: '비교 내용 확인', exact: true })
+    .getByRole('button', { name: '자료 교체와 비교 내용 재검토', exact: true })
     .click()
   await expect(
     page.getByRole('dialog', { name: '새 업무 등록' }),
@@ -186,7 +186,9 @@ test('publication confirmation preserves pending checks and v1 remains available
     .getByRole('button', { name: '내가 등록한 업무', exact: true })
     .click()
   await page.getByRole('button', { name: '재고 입고 기록 더 보기' }).click()
-  await page.getByRole('button', { name: '새 버전 검토', exact: true }).click()
+  await page
+    .getByRole('button', { name: '자료 교체와 비교 내용 재검토', exact: true })
+    .click()
   await expect(page.getByLabel('확인한 절차', { exact: true })).toHaveValue(
     '수정본에서는 실제 수량과 차이 사유를 함께 기록해요.',
   )
