@@ -105,8 +105,8 @@ src/
     ui.css               공통 UI
     layout.css           메뉴, 상단 바와 본문 배치
     pages.css            확인용 화면 등 페이지별 배치
-tests/                   메뉴, 컴포넌트와 접근성 브라우저 점검
-docs/API_INTEGRATION.md   백엔드 연결 제안과 경계
+tests/                   메뉴, 컴포넌트, 접근성과 API 전송 브라우저 점검
+docs/API_INTEGRATION.md   트래커 기준 API 경로와 연결 경계
 ```
 
 Noto Sans KR은 `@fontsource-variable/noto-sans-kr` 패키지로 번들에 포함합니다. 실행 중 외부 폰트 서버를 호출하지 않습니다. 메뉴 아이콘은 Figma 원본에서 내보낸 PNG와 SVG이며 다른 조작 아이콘은 `lucide-react`를 씁니다. 로고는 피그마의 W 표시와 텍스트로 구현했습니다. 화면 전체를 이미지로 넣지 않았습니다. 출처는 `src/assets/README.md`에 적었습니다.
@@ -134,9 +134,9 @@ Noto Sans KR은 `@fontsource-variable/noto-sans-kr` 패키지로 번들에 포�
 
 ## 실제 API 연결 위치
 
-화면에서 직접 fetch를 호출하지 않습니다. 이후 `src/services/`에 업무별 서비스 함수를 만들고 `src/services/api/client.js`를 통해 요청하세요. 현재 client 함수는 어느 화면에서도 호출하지 않습니다. API 주소와 인증 방식은 확정 전입니다.
+화면에서 직접 fetch를 호출하지 않습니다. 이후 `src/services/`에 업무별 서비스 함수를 만들고 `src/services/api/client.js`를 통해 요청하세요. 현재 client 함수는 어느 화면에서도 호출하지 않습니다. 기본 경로는 Notion API 작업 트래커의 `/api/v1`입니다. 실제 서버 주소와 인증 방식은 아직 확인이 필요합니다. JSON, FormData 업로드, 원본 Response 다운로드와 204 응답 처리를 지원합니다.
 
-`analyzeMaterials()` 등의 이름과 요청, 응답 구조는 **백엔드와 합의하지 않은 제안안**입니다. 아직 쓰지 않는 빈 함수를 만들지 않았습니다. [API 연결 설명](docs/API_INTEGRATION.md)을 기준으로 다음 차수에서 실제 쓰는 함수부터 추가하세요.
+트래커의 30개 경로와 요청·성공 응답 예시를 연결 문서에 반영했습니다. 함수명은 **프런트엔드 제안**이며 예시를 최종 스키마로 단정하지 않습니다. 아직 쓰지 않는 빈 함수를 만들지 않았습니다. [API 연결 설명](docs/API_INTEGRATION.md)을 기준으로 다음 차수에서 실제 쓰는 함수부터 추가하세요.
 
 `AppLayout`의 `assistant` prop에 패널을 넘기면 본문 옆의 360px 영역에 배치할 수 있습니다. 화면 폭이 좁아지면 본문 아래로 옮겨집니다. Drawer로 띄울 때는 `AssistantPanel`을 자식으로 넘기세요. 실제 질문 입력과 대화 기록은 3차 작업입니다.
 
@@ -175,3 +175,7 @@ npm run dev
 `node_modules/`, `dist/`, `.env*` 비밀 설정, 검사 산출물은 제외합니다. 소스, 로컬 아이콘, 설정 파일, `package-lock.json`, README와 API 설명을 올립니다. `.env.example`에는 공개 가능한 예시 설정만 넣었습니다. 이전에 전달한 ZIP과 bundle은 최초 로컬 1차 커밋의 보관본입니다.
 
 PR은 `main`을 대상으로 하며 제목은 `[feat/#5] 공통 레이아웃과 UI 기반 구현`입니다. 본문에 `close #5`와 변경 전후 화면 캡처를 넣습니다. 팀원 한 명 이상이 리뷰하고 승인한 뒤 작성자가 직접 병합하고 작업 브랜치를 삭제합니다. 승인 전에는 이슈를 닫거나 브랜치를 삭제하지 않습니다. 이전 `feat/work-bridge-phase1` 브랜치는 기존 업로드 기록으로 남겨 둡니다.
+
+## API 트래커 정합성 수정
+
+[수정 이슈 #7](https://github.com/GDGoC-2026TeamA/Frontend/issues/7)의 브랜치는 `fix/#7`입니다. 병합된 1차 코드가 있는 최신 main에서 만들었습니다. API 기본 경로, multipart 업로드, 바이너리 응답 처리와 연결 문서를 수정했습니다. 실제 업무 API 호출이나 후속 화면은 추가하지 않았습니다.
