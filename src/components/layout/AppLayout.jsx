@@ -16,7 +16,7 @@ function locationLabel(pathname) {
 
 export function AppLayout({ children, assistant, homeAside, onHomeHelp }) {
   const location = useLocation()
-  const isHome = location.pathname === '/'
+  const isHome = location.pathname === '/' || location.pathname === '/work/new'
   const [help, setHelp] = useState(false)
   const [menu, setMenu] = useState(false)
   useEffect(() => {
