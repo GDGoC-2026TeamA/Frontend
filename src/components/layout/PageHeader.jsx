@@ -1,6 +1,14 @@
-export function PageHeader({ title, description, action, eyebrow }) {
+export function PageHeader({
+  title,
+  description,
+  action,
+  eyebrow,
+  variant = 'default',
+}) {
   return (
-    <div className="page-header">
+    <div
+      className={`page-header ${variant === 'home' ? 'page-header--home' : ''}`}
+    >
       <div className="page-header__text">
         {eyebrow && <p className="page-header__eyebrow">{eyebrow}</p>}
         <h1 tabIndex={-1} id="page-title">
