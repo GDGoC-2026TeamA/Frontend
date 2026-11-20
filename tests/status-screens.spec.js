@@ -10,7 +10,7 @@ test('loading cancels without losing input; sample error retries and replaces th
       writes.push(request.url())
   })
   await page.setViewportSize({ width: 1440, height: 1080 })
-  await page.goto('/work/input')
+  await page.goto('/work/input?fixture=read-error')
   await page.getByLabel('작업 이름', { exact: true }).fill('오후 입고 확인')
   await page.getByLabel('실제로 입고된 수량', { exact: true }).fill('24')
   await page
@@ -68,7 +68,7 @@ test('loading cancels without losing input; sample error retries and replaces th
 test('actual file never appears to have been read or uploaded', async ({
   page,
 }) => {
-  await page.goto('/work/input')
+  await page.goto('/work/input?fixture=read-error')
   await page.locator('input[type=file]').setInputFiles({
     name: 'my-private.txt',
     mimeType: 'text/plain',
@@ -140,13 +140,13 @@ test('empty collections use specific actions, responsive layout and meaningful s
 }) => {
   for (const [url, title, action, screenshot] of [
     [
-      '/work-cards',
+      '/work-cards?empty=1',
       '저장한 업무 카드가 없어요',
       '업무 선택하기',
       'status-empty-cards',
     ],
     [
-      '/history',
+      '/history?empty=1',
       '아직 시작한 작업이 없어요',
       '업무 시작하기',
       'status-empty-history',
@@ -206,7 +206,7 @@ test('no search results clears the term, keeps focus, and fits mobile', async ({
   await expect(input).toHaveValue('')
   await expect(input).toBeFocused()
   await expect(page.getByText('추천 검색어', { exact: true })).toBeVisible()
-  await page.goto('/work/input')
+  await page.goto('/work/input?fixture=read-error')
   await page
     .getByRole('button', { name: '예시 전표로 확인', exact: true })
     .click()
