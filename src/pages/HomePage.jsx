@@ -11,6 +11,7 @@ import { FileText, ArrowRight } from '../components/ui/DesignIcons'
 import { Badge, Button, Modal, StatePanel, SaveToast } from '../components/ui'
 import { getHomeDashboard } from '../services/homeService'
 import { beginLearningSession } from '../services/learningSessions'
+import { useDemoWork } from '../services/demo/workWorkspace'
 import {
   useDemoTasks,
   saveDemoTask,
@@ -37,10 +38,17 @@ export default function HomePage() {
   const [selectedTask, setSelectedTask] = useState(null)
   const [notice, setNotice] = useState('')
   const demoTasks = useDemoTasks()
+  const demoWork = useDemoWork()
   const data =
     remoteData &&
     (remoteData.source === 'demo'
-      ? { ...remoteData, tasks: demoTasks }
+      ? {
+          ...remoteData,
+          tasks: demoTasks,
+          recentJobs: demoWork.jobs,
+          resumeJobs: demoWork.jobs.filter((job) => job.stage !== 'result'),
+          recentCards: demoWork.cards,
+        }
       : remoteData)
   const listOnly = location.pathname === '/tasks'
   const filteredTasks =
@@ -68,8 +76,16 @@ export default function HomePage() {
       )
       return
     }
-    if (label === '업무 처리하기' && item?.name?.includes('재고')) {
-      navigate('/work/input')
+    if (label === '업무 처리하기') {
+      navigate('/work/input', { state: { taskId: item?.id } })
+      return
+    }
+    if (['작업 결과', '검토 이어하기'].includes(label)) {
+      navigate(`/jobs/${encodeURIComponent(item.id)}`)
+      return
+    }
+    if (label === '절차 보기') {
+      navigate(`/work-cards/${encodeURIComponent(item.id)}`)
       return
     }
     if (
@@ -115,12 +131,18 @@ export default function HomePage() {
       }}
     >
       {({ openMenu }) => (
-        <div className="page-stack home-page">
+        <div
+          className={`page-stack home-page ${listOnly ? 'workflow-task-list' : ''}`}
+        >
           <Header
             variant="home"
             onMenu={openMenu}
             title={listOnly ? '업무 목록' : '홈'}
-            description="배우던 업무와 처리하던 작업을 이어서 확인하세요."
+            description={
+              listOnly
+                ? '등록한 업무를 고르세요. 카드에서 업무 정보를 수정하거나, 학습과 실제 업무를 시작할 수 있어요.'
+                : '배우던 업무와 처리하던 작업을 이어서 확인하세요.'
+            }
             search={
               <HomeSearch
                 data={data}
@@ -164,7 +186,11 @@ export default function HomePage() {
                 id="home-registered"
                 aria-labelledby="registered-work-title"
               >
-                <h2 id="registered-work-title">등록된 업무</h2>
+                <h2 id="registered-work-title">
+                  {listOnly
+                    ? `등록된 업무 ${filteredTasks.length}개`
+                    : '등록된 업무'}
+                </h2>
                 <div className="home-section-heading">
                   <div
                     className="home-task-filters"
@@ -193,7 +219,17 @@ export default function HomePage() {
                 </div>
                 <div className="home-work-grid">
                   {filteredTasks.map((task) => (
-                    <WorkTile key={task.id} task={task} onAction={openAction} />
+                    <WorkTile
+                      key={task.id}
+                      task={task}
+                      onAction={openAction}
+                      onOpen={
+                        listOnly
+                          ? () =>
+                              navigate(`/tasks/${encodeURIComponent(task.id)}`)
+                          : undefined
+                      }
+                    />
                   ))}
                 </div>
                 {!filteredTasks.length && (

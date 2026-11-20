@@ -225,3 +225,7 @@ VITE_API_BASE_URL=https://gdgoc2026a.up.railway.app/api/v1
 ## 3차 학습 화면
 
 홈의 ‘새 방식 익히기’에서 항목 선택, 상황별 연습, 결과와 근거, AI 질문을 확인할 수 있습니다. 화면 대응, 예시 동작과 API 연결 범위는 [PHASE3_LEARNING.md](docs/PHASE3_LEARNING.md)에 적었습니다. 예시 학습 기록은 탭 메모리에만 남으며, API 모드의 연습 생성과 채점은 서버 계약 확인이 필요합니다.
+
+## 4차 실제 업무 화면
+
+업무 목록에서 상세를 확인하고 재고와 예약 작업을 시작할 수 있습니다. 초안 수정, 검토 후 결과 저장, 개인 업무 카드와 작업 내역을 연결했습니다. 화면 대응과 API 연결 범위는 [PHASE4_WORKFLOW.md](docs/PHASE4_WORKFLOW.md)에 적었습니다.

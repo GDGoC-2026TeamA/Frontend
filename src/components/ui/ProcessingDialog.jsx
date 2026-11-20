@@ -8,6 +8,7 @@ export function ProcessingDialog({
   phase,
   filename,
   isExample,
+  loadingDescription,
   onCancel,
   onRetry,
   onReplace,
@@ -40,7 +41,8 @@ export function ProcessingDialog({
         <h3>{title}</h3>
         <p>
           {loading
-            ? '입고 전표에서 품목 코드와 수량을 확인하고 있어요.'
+            ? loadingDescription ||
+              '입고 전표에서 품목 코드와 수량을 확인하고 있어요.'
             : isExample
               ? '전표를 다시 선택하거나 잠시 후 다시 시도해 주세요.'
               : '선택한 파일을 보내거나 읽지 않았어요. 실제 문서 분석은 아직 연결되지 않았어요.'}

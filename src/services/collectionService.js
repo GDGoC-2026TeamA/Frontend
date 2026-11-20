@@ -1,12 +1,18 @@
 import { apiRequest } from './api/client'
+import { readDemoCollection } from './demo/workWorkspace'
 
 export async function getCollection(
   kind,
-  { signal, mode = import.meta.env.VITE_DATA_MODE || 'demo' } = {},
+  {
+    signal,
+    emptyDemo = false,
+    mode = import.meta.env.VITE_DATA_MODE || 'demo',
+  } = {},
 ) {
   if (!['cards', 'jobs'].includes(kind))
     throw new Error('목록 종류를 확인해 주세요.')
-  if (mode === 'demo') return { items: [], source: 'demo' }
+  if (mode === 'demo')
+    return { items: emptyDemo ? [] : readDemoCollection(kind), source: 'demo' }
   if (mode !== 'api') throw new Error('지원하지 않는 데이터 모드예요.')
   const result = await apiRequest(kind, { signal })
   if (!Array.isArray(result?.items))

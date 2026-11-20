@@ -31,7 +31,7 @@ export function Sidebar({
   onAccountAction,
 }) {
   const home = variant === 'home'
-  const learning = useLocation().pathname.startsWith('/learn/')
+  const learning = /^\/(learn\/|work\/input)/.test(useLocation().pathname)
   return (
     <div
       className={`sidebar__content ${home ? 'sidebar__content--home' : ''} ${mobile ? 'sidebar__content--mobile' : ''}`}

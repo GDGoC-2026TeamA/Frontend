@@ -5,7 +5,7 @@ import reservation from '../../assets/home/reservation.svg?no-inline'
 import blue from '../../assets/home/status-blue.svg?no-inline'
 import success from '../../assets/home/status-success.svg?no-inline'
 
-export function WorkTile({ task, onAction }) {
+export function WorkTile({ task, onAction, onOpen }) {
   const artwork =
     task.artwork ||
     (/예약/.test(task.name)
@@ -15,7 +15,16 @@ export function WorkTile({ task, onAction }) {
         : null)
   const completed = task.learningStatus === '학습 완료'
   return (
-    <article className="work-tile">
+    <article
+      className="work-tile"
+      onClick={
+        onOpen
+          ? (event) => {
+              if (!event.target.closest('button,a')) onOpen()
+            }
+          : undefined
+      }
+    >
       <div
         className={
           'work-tile__artwork work-tile__artwork--' + (artwork || 'none')
@@ -28,7 +37,15 @@ export function WorkTile({ task, onAction }) {
       <TaskMenu task={task} onAction={onAction} />
       <div className="work-tile__content">
         <div className="work-tile__heading">
-          <h3>{task.name}</h3>
+          <h3>
+            {onOpen ? (
+              <button className="workflow-task-open" onClick={onOpen}>
+                {task.name}
+              </button>
+            ) : (
+              task.name
+            )}
+          </h3>
           <Badge
             tone={completed ? 'success' : 'changed'}
             dotIcon={completed ? success : blue}
