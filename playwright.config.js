@@ -9,6 +9,9 @@ const systemBrowser =
     'C:/Program Files/Google/Chrome/Application/chrome.exe',
   ].find(existsSync)
 
+const port = Number(process.env.PLAYWRIGHT_PORT || 5173)
+const baseURL = `http://127.0.0.1:${port}`
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: false,
@@ -17,12 +20,12 @@ export default defineConfig({
   use: {
     ...devices['Desktop Chrome'],
     launchOptions: systemBrowser ? { executablePath: systemBrowser } : {},
-    baseURL: 'http://127.0.0.1:5173',
+    baseURL,
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run dev -- --port 5173 --strictPort',
-    url: 'http://127.0.0.1:5173',
+    command: `node node_modules/vite/bin/vite.js --host 127.0.0.1 --port ${port} --strictPort`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
   },
 })

@@ -12,6 +12,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="work/new" element={<HomePage />} />
       <Route element={<AppLayout />}>
         <Route
           path="work-cards"
@@ -32,17 +33,6 @@ export default function App() {
               description="이번 작업에서 검토하고 수정한 결과를 확인하세요."
               emptyTitle="검토한 작업 결과를 모아 봐요"
               emptyDescription="저장한 작업 결과가 이곳에 표시될 예정이에요. 결과 저장과 조회는 아직 연결되지 않았어요."
-            />
-          }
-        />
-        <Route
-          path="work/new"
-          element={
-            <PlaceholderPage
-              title="새 업무 등록"
-              description="기존 양식과 새 시스템 매뉴얼을 업무 기준 자료로 등록해요."
-              emptyTitle="업무 자료를 담을 공간을 준비하고 있어요"
-              emptyDescription="업무 등록은 다음 화면 작업에서 연결됩니다. 지금은 파일을 업로드하거나 분석하지 않아요."
             />
           }
         />
