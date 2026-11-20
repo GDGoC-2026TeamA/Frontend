@@ -103,11 +103,13 @@ test('comparison edit persists user text and keeps outstanding question visible'
     .getByRole('dialog', { name: '새 업무 등록', exact: true })
     .getByRole('button', { name: '새 방식 익히기', exact: true })
     .click()
+  await expect(page).toHaveURL(/\/learn\//)
   await expect(
-    page
-      .getByRole('dialog', { name: '새 업무 등록', exact: true })
-      .getByRole('status'),
-  ).toContainText('3차')
+    page.getByRole('heading', { name: '새 방식 익히기', exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: '비교 내용 보기', exact: true }),
+  ).toBeVisible()
 })
 
 test('cancel analysis, focus trap, close, reopen and mobile layouts', async ({
