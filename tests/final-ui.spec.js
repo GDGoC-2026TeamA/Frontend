@@ -115,9 +115,17 @@ anonymousTest(
     })
     await page.goto('/login')
     await page.getByRole('link', { name: '비밀번호를 잊으셨나요?' }).click()
-    await expect(page).toHaveURL(/\/forgot-password$/)
-    await page.getByLabel('이메일', { exact: false }).fill('first@example.com')
-    await page.getByRole('button', { name: '재설정 링크 보내기' }).click()
+    const resetForm = page.getByRole('region', {
+      name: '비밀번호 재설정',
+      exact: true,
+    })
+    const email = resetForm.getByRole('textbox', {
+      name: '이메일 (필수)',
+      exact: true,
+    })
+    await email.fill('first@example.com')
+    await expect(email).toHaveValue('first@example.com')
+    await resetForm.getByRole('button', { name: '재설정 링크 보내기' }).click()
     await expect(page.getByRole('alert')).toContainText(
       '계정 서버가 연결되지 않았어요',
     )
