@@ -20,7 +20,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
-      - run: node --test checks/*.test.mjs
+      - run: node --experimental-vm-modules --test checks/*.test.mjs
       - run: npm run build
         env:
           VITE_DATA_MODE: api
