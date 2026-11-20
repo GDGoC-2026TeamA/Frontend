@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { spawn } from 'node:child_process'
 
+const apiPort = process.env.PLAYWRIGHT_API_PORT || '5174'
+const apiURL = `http://127.0.0.1:${apiPort}`
+
 let server
 test.beforeAll(async () => {
   server = spawn(
@@ -10,7 +13,7 @@ test.beforeAll(async () => {
       '--host',
       '127.0.0.1',
       '--port',
-      '5174',
+      apiPort,
       '--strictPort',
     ],
     {
@@ -29,7 +32,7 @@ test.beforeAll(async () => {
     if (server.exitCode !== null)
       throw new Error('API mode test server did not start')
     try {
-      const response = await fetch('http://127.0.0.1:5174')
+      const response = await fetch(apiURL)
       if (response.ok) {
         started = true
         break
@@ -70,7 +73,7 @@ test('API home shows loading, 404, retry, empty and server data without demo fal
       )
     },
   )
-  await page.goto('http://127.0.0.1:5174')
+  await page.goto(apiURL)
   await expect(
     page.getByRole('status').getByText('업무를 불러오고 있어요'),
   ).toBeVisible()
