@@ -1,0 +1,69 @@
+.wb-shell {
+  display: grid;
+  grid-template-columns: minmax(180px, 235px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+.wb-shell aside {
+  padding: 24px;
+  background: #eef3f8;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.wb-switch {
+  margin-top: auto;
+  display: grid;
+  gap: 0.6rem;
+  overflow-wrap: anywhere;
+}
+.wb-space {
+  padding: clamp(16px, 4vw, 52px);
+  width: min(100%, 1000px);
+  margin: 0 auto;
+}
+.wb-space form,
+.wb-space fieldset {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1rem 0;
+}
+.wb-space article,
+.wb-space fieldset {
+  padding: 1rem;
+  border: 1px solid #ccd5df;
+  border-radius: 0.7rem;
+}
+.wb-space label,
+.wb-switch label {
+  display: block;
+  margin: 0.35rem 0;
+}
+.wb-space input:not([type='checkbox']):not([type='radio']),
+.wb-space textarea,
+.wb-space select,
+.wb-switch select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #9aa8b6;
+  border-radius: 0.35rem;
+}
+.wb-space button,
+.wb-switch button {
+  padding: 0.5rem 0.8rem;
+  margin: 0.15rem;
+  background: #eaf0f8;
+  border-radius: 0.35rem;
+  color: #143358;
+}
+@media (max-width: 650px) {
+  .wb-shell {
+    display: block;
+  }
+  .wb-shell aside {
+    padding: 1rem;
+  }
+  .wb-switch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

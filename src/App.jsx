@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
+import WorkspacePage from './pages/WorkspacePage'
 import HomePage from './pages/HomePage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import CollectionPage from './pages/CollectionPage'
@@ -13,7 +14,17 @@ const previewEnabled =
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route
+        path="/"
+        element={
+          import.meta.env.VITE_DATA_MODE === 'api' ? (
+            <WorkspacePage />
+          ) : (
+            <HomePage />
+          )
+        }
+      />
+      <Route path="/spaces" element={<WorkspacePage />} />
       <Route path="work/new" element={<HomePage />} />
       <Route
         path="work-cards"

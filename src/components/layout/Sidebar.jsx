@@ -78,6 +78,9 @@ export function Sidebar({
             사용 방법 보기
           </button>
         </div>
+        <Link to="/spaces" onClick={onNavigate}>
+          작업 공간 전환 · 생성 · 참여
+        </Link>
         <div className="sidebar__identity">
           <span className="sidebar__avatar" aria-hidden="true">
             내
