@@ -26,3 +26,5 @@ import './styles/foundation.css'
 import './styles/phase2-v04.css'
 import './styles/learning.css'
 import './styles/workflow.css'
+
+import './styles/final-ui.css'
