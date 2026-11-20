@@ -251,7 +251,7 @@ test('desktop and mobile layouts and accessibility', async ({
   for (const path of ['/', '/dev/components']) {
     await page.goto(path)
     if (path !== '/') {
-      await expect(page.locator('.sidebar')).toHaveCSS('width', '240px')
+      await expect(page.locator('.sidebar')).toHaveCSS('width', '208px')
       await expect(page.locator('.header')).toHaveCSS('height', '72px')
     }
     const results = await new AxeBuilder({ page })

@@ -376,89 +376,6 @@
 .home-search__empty .button {
   margin-top: var(--wb-space-8);
 }
-.home-onboarding {
-  position: fixed;
-  inset: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  width: 100vw;
-  height: 100dvh;
-  max-width: none;
-  max-height: none;
-  background: transparent;
-  color: var(--wb-color-text);
-  overflow: hidden;
-}
-.home-onboarding::backdrop {
-  background: transparent;
-}
-.home-onboarding__mask {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.home-onboarding__callout {
-  position: absolute;
-  width: 524px;
-  max-width: calc(100vw - 32px);
-  background: var(--wb-color-surface);
-  border: 1px solid var(--wb-color-border);
-  border-radius: var(--wb-radius-16);
-  box-shadow: var(--wb-shadow-popover);
-  padding: var(--wb-space-20);
-  display: flex;
-  flex-direction: column;
-  gap: var(--wb-space-12);
-}
-.home-onboarding__callout::before {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 26px;
-  width: 14px;
-  height: 14px;
-  border-radius: 2px;
-  background: var(--wb-color-surface);
-  transform: rotate(45deg);
-}
-.home-onboarding ol {
-  display: flex;
-  flex-direction: column;
-  gap: var(--wb-space-12);
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.home-onboarding li {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-.home-onboarding li > span {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  font: var(--wb-font-label);
-  background: var(--wb-color-primary-soft);
-  color: var(--wb-color-primary);
-  border-radius: var(--wb-radius-full);
-}
-.home-onboarding h3 {
-  font: var(--wb-font-label);
-  margin-bottom: 2px;
-}
-.home-onboarding p {
-  font: var(--wb-font-small);
-  color: var(--wb-color-secondary);
-}
-.home-onboarding footer {
-  display: flex;
-  justify-content: flex-end;
-}
 @media (min-width: 1200px) and (max-width: 1399px) {
   .home-workspace {
     grid-template-columns: var(--wb-size-home-sidebar) minmax(0, 1fr);
@@ -475,16 +392,6 @@
 @media (max-width: 1399px) {
   .home-workspace .home-quick-panel {
     box-shadow: none;
-  }
-}
-@media (max-width: 1199px) {
-  .home-onboarding__callout {
-    bottom: var(--wb-space-16);
-    max-height: calc(100dvh - 32px);
-    overflow-y: auto;
-  }
-  .home-onboarding__callout::before {
-    display: none;
   }
 }
 @media (max-width: 1000px) {

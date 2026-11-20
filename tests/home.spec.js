@@ -84,7 +84,7 @@ test('home matches design slots, uses local original artwork, and keeps actions 
   expect(writes).toEqual([])
 })
 
-test('home tour highlights real areas, contains focus, closes and returns focus', async ({
+test('home guide uses one backdrop, highlights real areas and restores focus', async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 1080 })
@@ -94,7 +94,7 @@ test('home tour highlights real areas, contains focus, closes and returns focus'
   await help.click()
   const tour = page.getByRole('dialog', { name: '홈에서 어디로 가면 되나요?' })
   await expect(tour).toBeVisible()
-  await expect(tour.locator('svg > g')).toHaveCount(3)
+  await expect(tour.locator('.guide-dialog__highlight')).toHaveCount(3)
   const confirm = tour.getByRole('button', { name: '확인했어요' })
   await expect(confirm).toBeFocused()
   await page.keyboard.press('Tab')
