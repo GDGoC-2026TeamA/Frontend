@@ -14,6 +14,7 @@ function Overlay({
   footer,
   drawer = false,
   className = '',
+  closeLabel,
 }) {
   const ref = useRef(null)
   const titleId = useId()
@@ -89,7 +90,7 @@ function Overlay({
             aria-label={`${title} 닫기`}
             onClick={onClose}
           >
-            <X size={20} aria-hidden="true" />
+            {closeLabel || <X size={20} aria-hidden="true" />}
           </Button>
         </header>
         {description && (

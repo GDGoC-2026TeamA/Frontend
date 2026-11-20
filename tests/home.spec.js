@@ -90,7 +90,7 @@ test('home guide uses one backdrop, highlights real areas and restores focus', a
   await page.setViewportSize({ width: 1440, height: 1080 })
   await page.goto('/')
   await expect(page.locator('.work-tile')).toHaveCount(2)
-  const help = page.getByRole('button', { name: '사용 방법 보기', exact: true })
+  const help = page.getByRole('button', { name: '가이드 보기', exact: true })
   await help.click()
   const tour = page.getByRole('dialog', { name: '홈에서 어디로 가면 되나요?' })
   await expect(tour).toBeVisible()
@@ -145,7 +145,7 @@ test('in-place search supports recommendations, keyboard results, clear, empty a
   await input.press('ArrowDown')
   await input.press('Enter')
   await expect(
-    page.getByRole('dialog', { name: '업무 상세', exact: true }),
+    page.getByRole('dialog', { name: '공유 업무 확인', exact: true }),
   ).toBeVisible()
   await page.keyboard.press('Escape')
   await input.focus()
@@ -232,7 +232,7 @@ test('mobile search and tour fit viewport; small widths do not overflow after da
   await page.getByRole('button', { name: '메뉴 열기', exact: true }).click()
   await page
     .getByRole('dialog', { name: '워크스페이스 메뉴', exact: true })
-    .getByRole('button', { name: '사용 방법 보기', exact: true })
+    .getByRole('button', { name: '가이드 보기', exact: true })
     .click()
   const tour = page.getByRole('dialog', { name: '홈에서 어디로 가면 되나요?' })
   await expect(tour).toBeVisible()

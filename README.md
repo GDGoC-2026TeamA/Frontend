@@ -217,3 +217,7 @@ VITE_API_BASE_URL=https://gdgoc2026a.up.railway.app/api/v1
 ### 1차 공통 구현 V0.4
 
 최신 Figma 기준 변경 목록, 컴포넌트 연결 범위와 UI/서버 통합 QA 구분은 [docs/FOUNDATION_V04.md](docs/FOUNDATION_V04.md)를 확인하세요.
+
+### 수정된 2차 화면
+
+[홈과 업무 등록, 자료 비교 변경 목록](docs/PHASE2_V04.md)에서 Figma 두 섹션의 대응 화면과 예시/서버 연결 범위를 확인하세요.

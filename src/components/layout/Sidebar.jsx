@@ -1,3 +1,5 @@
+import { List } from 'lucide-react'
+import { AccountMenu } from '../ui/AccountMenu'
 import { NavLink, Link } from 'react-router-dom'
 import homeIcon from '../../assets/home/home.svg?no-inline'
 import bookIcon from '../../assets/icons/book-open.png'
@@ -6,6 +8,7 @@ import clockIcon from '../../assets/home/history.svg?no-inline'
 
 const items = [
   { to: '/', label: '홈', icon: homeIcon, iconClass: 'sidebar__icon--home' },
+  { to: '/tasks', label: '업무 목록', iconClass: 'sidebar__icon--list' },
   {
     to: '/work-cards',
     label: '개인 업무 카드',
@@ -25,6 +28,7 @@ export function Sidebar({
   onNavigate,
   mobile = false,
   variant = 'work',
+  onAccountAction,
 }) {
   const home = variant === 'home'
   return (
@@ -53,7 +57,7 @@ export function Sidebar({
               }
             >
               <span className={`sidebar__icon ${iconClass}`} aria-hidden="true">
-                <img src={icon} alt="" />
+                {icon ? <img src={icon} alt="" /> : <List size={24} />}
               </span>
               <span>{label}</span>
             </NavLink>
@@ -75,18 +79,14 @@ export function Sidebar({
             )}
           </p>
           <button type="button" onClick={onHelp} className="text-button">
-            사용 방법 보기
+            가이드 보기
           </button>
         </div>
-        <div className="sidebar__identity">
-          <span className="sidebar__avatar" aria-hidden="true">
-            내
-          </span>
-          <div>
-            <p>{home ? '작업 공간' : '내 작업 공간'}</p>
-            <small>개인 워크스페이스</small>
-          </div>
-        </div>
+        <AccountMenu
+          onProfile={() => onAccountAction?.('프로필')}
+          onSettings={() => onAccountAction?.('설정')}
+          onLogout={() => onAccountAction?.('로그아웃')}
+        />
       </div>
     </div>
   )

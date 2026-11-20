@@ -27,6 +27,7 @@ export function Header({
   description,
   search,
   showSearch = true,
+  action,
 }) {
   if (variant === 'home')
     return (
@@ -42,6 +43,7 @@ export function Header({
           </Button>
           <PageHeader title={title} variant="home" />
           {showSearch && (search || <SearchField variant="home" />)}
+          {action}
         </div>
         {description && <p className="text-secondary">{description}</p>}
       </header>
