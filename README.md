@@ -221,3 +221,7 @@ VITE_API_BASE_URL=https://gdgoc2026a.up.railway.app/api/v1
 ### 수정된 2차 화면
 
 [홈과 업무 등록, 자료 비교 변경 목록](docs/PHASE2_V04.md)에서 Figma 두 섹션의 대응 화면과 예시/서버 연결 범위를 확인하세요.
+
+## 3차 학습 화면
+
+홈의 ‘새 방식 익히기’에서 항목 선택, 상황별 연습, 결과와 근거, AI 질문을 확인할 수 있습니다. 화면 대응, 예시 동작과 API 연결 범위는 [PHASE3_LEARNING.md](docs/PHASE3_LEARNING.md)에 적었습니다. 예시 학습 기록은 탭 메모리에만 남으며, API 모드의 연습 생성과 채점은 서버 계약 확인이 필요합니다.

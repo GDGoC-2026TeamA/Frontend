@@ -27,6 +27,7 @@ export function LearningRecommendation({
   name = 'learning-topic',
   value,
   confirmed = true,
+  choiceType = 'radio',
 }) {
   const id = useId()
   const canPractice = confirmed && Boolean(evidence)
@@ -54,6 +55,7 @@ export function LearningRecommendation({
       <p>추천 이유 / {reason}</p>
       <p>근거 / {evidence || '자료에서 확인되지 않았어요.'}</p>
       <LearningChoice
+        type={choiceType}
         name={name}
         value={value}
         checked={selected && canPractice}

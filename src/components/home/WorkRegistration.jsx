@@ -24,7 +24,13 @@ const descriptions = {
   revised: '수정한 절차와 현장에서 확인할 항목을 다시 확인해요.',
 }
 
-export function WorkRegistration({ onClose, task, onSave, onShowShared }) {
+export function WorkRegistration({
+  onClose,
+  task,
+  onSave,
+  onShowShared,
+  onLearn,
+}) {
   const readOnly = task?.scope === 'shared'
   const [personalOnly, setPersonalOnly] = useState(task?.personalOnly || false)
   const [record, setRecord] = useState(task || null)
@@ -65,7 +71,6 @@ export function WorkRegistration({ onClose, task, onSave, onShowShared }) {
     task?.draft?.question || task?.saved?.question || example.question,
   )
   const [saved, setSaved] = useState(task?.draft || task?.saved || null)
-  const [nextNotice, setNextNotice] = useState(false)
   const controller = useRef(null)
   const heading = useRef(null)
   const apiMode = import.meta.env.VITE_DATA_MODE === 'api'
@@ -273,7 +278,9 @@ export function WorkRegistration({ onClose, task, onSave, onShowShared }) {
                 ) : (
                   <span>기준 v{currentVersion} / 읽기 전용</span>
                 )}
-                <Button onClick={() => setNextNotice(true)}>
+                <Button
+                  onClick={() => onLearn?.(readOnly ? task : buildRecord())}
+                >
                   새 방식 익히기
                 </Button>
               </>
@@ -294,7 +301,9 @@ export function WorkRegistration({ onClose, task, onSave, onShowShared }) {
                 <Button variant="ghost" onClick={startEdit}>
                   내용 다시 수정
                 </Button>
-                <Button onClick={() => setNextNotice(true)}>
+                <Button
+                  onClick={() => onLearn?.(readOnly ? task : buildRecord())}
+                >
                   새 방식 익히기
                 </Button>
               </>
@@ -685,18 +694,6 @@ export function WorkRegistration({ onClose, task, onSave, onShowShared }) {
                   피그마 예시 자료의 근거예요.
                 </small>
               </aside>
-            </div>
-          )}
-          {nextNotice && (
-            <div className="registration-note" role="status">
-              <h3>비교 내용 확인까지 마쳤어요.</h3>
-              <p>
-                새 방식 익히기와 상황별 연습은 3차 화면에서 연결해요. 승인
-                담당자 질문은 아직 확인이 필요해요.
-              </p>
-              <Button variant="ghost" onClick={() => setNextNotice(false)}>
-                비교 계속 보기
-              </Button>
             </div>
           )}
         </div>

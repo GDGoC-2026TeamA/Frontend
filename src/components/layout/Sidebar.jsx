@@ -1,6 +1,6 @@
 import { List } from 'lucide-react'
 import { AccountMenu } from '../ui/AccountMenu'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink, Link, useLocation } from 'react-router-dom'
 import homeIcon from '../../assets/home/home.svg?no-inline'
 import bookIcon from '../../assets/icons/book-open.png'
 import cardIcon from '../../assets/home/work-card.svg?no-inline'
@@ -31,6 +31,7 @@ export function Sidebar({
   onAccountAction,
 }) {
   const home = variant === 'home'
+  const learning = useLocation().pathname.startsWith('/learn/')
   return (
     <div
       className={`sidebar__content ${home ? 'sidebar__content--home' : ''} ${mobile ? 'sidebar__content--mobile' : ''}`}
@@ -53,7 +54,7 @@ export function Sidebar({
               end={to === '/'}
               onClick={onNavigate}
               className={({ isActive }) =>
-                `sidebar__link ${isActive ? 'is-active' : ''}`
+                `sidebar__link ${isActive || (learning && to === '/tasks') ? 'is-active' : ''}`
               }
             >
               <span className={`sidebar__icon ${iconClass}`} aria-hidden="true">

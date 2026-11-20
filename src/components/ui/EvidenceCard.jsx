@@ -8,6 +8,7 @@ export function EvidenceCard({
   label = '매뉴얼',
   note,
   onOpen,
+  missingMessage = '등록된 자료에서 근거를 찾지 못했어요. 확인되지 않은 내용입니다.',
 }) {
   return (
     <article className="evidence-card">
@@ -21,9 +22,7 @@ export function EvidenceCard({
       {quote ? (
         <blockquote>{quote}</blockquote>
       ) : (
-        <p className="evidence-card__missing">
-          등록된 자료에서 근거를 찾지 못했어요. 확인되지 않은 내용입니다.
-        </p>
+        <p className="evidence-card__missing">{missingMessage}</p>
       )}
       {onOpen && (
         <button className="text-button" type="button" onClick={onOpen}>
