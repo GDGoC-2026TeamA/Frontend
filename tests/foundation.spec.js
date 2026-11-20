@@ -27,6 +27,8 @@ test('main navigation, unfinished routes, and help modal', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: '새 업무 등록', exact: true }),
   ).toBeVisible()
+  await page.keyboard.press('Escape')
+  await nav.getByRole('link', { name: '개인 업무 카드', exact: true }).click()
   const help = page.getByRole('button', { name: '사용 방법 보기', exact: true })
   await help.click()
   const dialog = page.getByRole('dialog', { name: 'WORK BRIDGE 사용 방법' })
