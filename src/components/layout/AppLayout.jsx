@@ -10,13 +10,23 @@ function locationLabel(pathname) {
   if (pathname === '/work-cards') return '개인 업무 카드'
   if (pathname === '/history') return '작업 내역'
   if (pathname === '/work/new') return '새 업무 등록'
+  if (pathname === '/work/input') return '업무 자료 입력'
   if (pathname === '/dev/components') return '컴포넌트 확인'
   return '페이지 안내'
 }
 
-export function AppLayout({ children, assistant, homeAside, onHomeHelp }) {
+export function AppLayout({
+  children,
+  assistant,
+  homeAside,
+  onHomeHelp,
+  variant,
+}) {
   const location = useLocation()
-  const isHome = location.pathname === '/' || location.pathname === '/work/new'
+  const isHome =
+    variant === 'home' ||
+    location.pathname === '/' ||
+    location.pathname === '/work/new'
   const [help, setHelp] = useState(false)
   const [menu, setMenu] = useState(false)
   useEffect(() => {

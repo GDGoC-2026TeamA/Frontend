@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
 import HomePage from './pages/HomePage'
 import PlaceholderPage from './pages/PlaceholderPage'
+import CollectionPage from './pages/CollectionPage'
+import WorkInputPage from './pages/WorkInputPage'
 import ComponentPreviewPage from './pages/ComponentPreviewPage'
 
 const previewEnabled =
@@ -13,29 +15,16 @@ export default function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="work/new" element={<HomePage />} />
+      <Route
+        path="work-cards"
+        element={<CollectionPage key="cards" kind="cards" />}
+      />
+      <Route
+        path="history"
+        element={<CollectionPage key="jobs" kind="jobs" />}
+      />
+      <Route path="work/input" element={<WorkInputPage />} />
       <Route element={<AppLayout />}>
-        <Route
-          path="work-cards"
-          element={
-            <PlaceholderPage
-              title="개인 업무 카드"
-              description="다음 업무에서 다시 볼 처리 절차를 모아 두세요."
-              emptyTitle="확인한 절차를 카드로 남겨요"
-              emptyDescription="학습하며 저장한 개인 업무 카드가 이곳에 표시될 예정이에요. 카드 저장과 조회는 아직 연결되지 않았어요."
-            />
-          }
-        />
-        <Route
-          path="history"
-          element={
-            <PlaceholderPage
-              title="작업 내역"
-              description="이번 작업에서 검토하고 수정한 결과를 확인하세요."
-              emptyTitle="검토한 작업 결과를 모아 봐요"
-              emptyDescription="저장한 작업 결과가 이곳에 표시될 예정이에요. 결과 저장과 조회는 아직 연결되지 않았어요."
-            />
-          }
-        />
         {previewEnabled && (
           <Route path="dev/components" element={<ComponentPreviewPage />} />
         )}

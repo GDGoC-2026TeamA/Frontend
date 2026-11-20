@@ -9,6 +9,7 @@ import {
   Stepper,
   Textarea,
 } from '../ui'
+import { StatusIcon } from '../ui/StatusIcon'
 import { registrationExample as example } from '../../data/registration'
 import { analyzeRegistrationExample } from '../../services/registrationService'
 
@@ -64,9 +65,7 @@ export function WorkRegistration({ onClose }) {
   }
   const selectFiles = (index, selected) => {
     setFiles((previous) =>
-      previous.map((group, i) =>
-        i === index ? selected : group.filter((file) => !file.example),
-      ),
+      previous.map((group, i) => (i === index ? selected : group)),
     )
     setSample(false)
     setResult(null)
@@ -111,6 +110,8 @@ export function WorkRegistration({ onClose }) {
     setSaved({ procedure: procedure.trim(), question: question.trim() })
     changeStage('revised')
   }
+  const missingManual =
+    stage === 'register' && files[0].length > 0 && !files[1].length
   const wide = ['compare', 'edit', 'revised'].includes(stage)
   const warning = (
     <div className="registration-warning">
@@ -246,7 +247,14 @@ export function WorkRegistration({ onClose }) {
                 }
               >
                 {example.materials.map((material, index) => (
-                  <div key={material.kind}>
+                  <div
+                    key={material.kind}
+                    className={
+                      index === 1 && missingManual
+                        ? 'registration-missing'
+                        : undefined
+                    }
+                  >
                     {files[index].length ? (
                       <>
                         <h4>{material.kind}</h4>
@@ -280,13 +288,30 @@ export function WorkRegistration({ onClose }) {
                         ))}
                       </>
                     ) : (
-                      <FileUpload
-                        label={material.kind}
-                        files={files[index]}
-                        onChange={(selected) => selectFiles(index, selected)}
-                        multiple
-                        accept=".pdf,.xlsx,.csv,.docx,.txt,.png,.jpg,.jpeg"
-                      />
+                      <>
+                        {index === 1 && missingManual && (
+                          <div
+                            className="registration-missing__notice"
+                            role="alert"
+                          >
+                            <StatusIcon type="file" />
+                            <h4>새 시스템 매뉴얼이 빠졌어요</h4>
+                            <p>기존 양식과 비교할 새 매뉴얼을 추가해 주세요.</p>
+                          </div>
+                        )}
+                        <FileUpload
+                          label={material.kind}
+                          files={files[index]}
+                          onChange={(selected) => selectFiles(index, selected)}
+                          buttonLabel={
+                            index === 1 && missingManual
+                              ? '매뉴얼 선택하기'
+                              : undefined
+                          }
+                          multiple
+                          accept=".pdf,.xlsx,.csv,.docx,.txt,.png,.jpg,.jpeg"
+                        />
+                      </>
                     )}
                   </div>
                 ))}
