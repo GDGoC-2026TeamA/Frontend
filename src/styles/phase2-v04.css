@@ -1,0 +1,288 @@
+/* Figma 97:532 + 112:553: one-column home and reviewed baseline sharing. */
+.home-workspace--single {
+  grid-template-columns: 208px minmax(0, 1fr);
+  min-height: 1124px;
+}
+.home-workspace--single .main-content {
+  padding: 40px;
+}
+.home-page {
+  gap: 24px;
+}
+.home-header__top > .page-header {
+  flex: 1;
+}
+.home-header__top > .button:last-child {
+  flex-shrink: 0;
+}
+.home-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 408fr) minmax(0, 648fr);
+  gap: 24px;
+}
+.home-overview > section {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.home-overview h2 {
+  font: var(--wb-font-section);
+}
+.home-overview .home-resume {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 126px;
+  padding: 16px;
+  background: var(--wb-color-primary-soft);
+  border-radius: 16px;
+}
+.home-overview .home-resume h3 {
+  font: var(--wb-font-card);
+}
+.home-overview .home-resume p {
+  font: var(--wb-font-small);
+  color: var(--wb-color-secondary);
+}
+.home-overview .home-resume .button {
+  flex-shrink: 0;
+  padding: 8px;
+}
+.home-overview .home-resume img {
+  width: 16px;
+  height: 16px;
+}
+.home-overview__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.home-overview .home-saved-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 126px;
+  margin: 0;
+  padding: 16px;
+}
+.home-overview .home-saved-card__heading {
+  align-items: center;
+}
+.home-overview .home-saved-card h3 {
+  font: var(--wb-font-small);
+  font-weight: 500;
+}
+.home-overview .home-saved-card p {
+  font: var(--wb-font-caption);
+  overflow-wrap: anywhere;
+}
+.home-overview .home-saved-card__link {
+  align-self: flex-end;
+  margin: 0;
+}
+.home-foundation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.home-task-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.home-task-filters button {
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--wb-color-muted);
+  font: var(--wb-font-label);
+}
+.home-task-filters button[aria-pressed='true'] {
+  border-bottom-color: var(--wb-color-primary);
+  color: var(--wb-color-text);
+}
+.work-tile {
+  position: relative;
+  overflow: visible;
+}
+.work-tile__artwork {
+  border-radius: 16px 16px 0 0;
+}
+.task-menu {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  z-index: 1;
+}
+.task-menu__trigger {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--wb-color-border);
+  border-radius: 12px;
+  background: white;
+  color: var(--wb-color-secondary);
+}
+.task-menu__panel {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  min-width: 180px;
+  padding: 8px;
+  background: white;
+  border: 1px solid var(--wb-color-border);
+  border-radius: 12px;
+  box-shadow: var(--wb-shadow-panel);
+}
+.task-menu__panel button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  text-align: left;
+  background: white;
+  font: var(--wb-font-label);
+}
+.task-menu__panel button:hover {
+  background: var(--wb-color-primary-soft);
+}
+.home-recent {
+  margin-top: 24px;
+}
+.home-data-notice {
+  flex-wrap: wrap;
+}
+.home-workspace--single .sidebar__help {
+  padding: 0;
+  background: transparent;
+}
+.home-workspace--single .sidebar__identity {
+  padding-top: 0;
+  border: 0;
+}
+.home-workspace--single .sidebar__content {
+  min-height: 1124px;
+}
+.registration-modal .overlay__header .button {
+  width: auto;
+  font: var(--wb-font-label);
+}
+.registration-modal .registration-scope {
+  min-height: 100px;
+  align-items: center;
+}
+.registration-modal .registration-scope .checkbox {
+  margin-top: 8px;
+}
+.registration-comparison {
+  grid-template-columns: minmax(0, 712fr) minmax(0, 312fr);
+  gap: 32px;
+}
+.registration-modal--wide .stepper {
+  max-width: 712px;
+}
+.registration-comparison aside {
+  min-width: 0;
+}
+.registration-comparison aside .publication-status small {
+  overflow-wrap: anywhere;
+}
+.registration-modal .overlay__footer {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.review-share-dialog {
+  width: min(640px, calc(100vw - 32px));
+}
+.review-share-dialog .overlay__header .button {
+  width: auto;
+}
+.registration-demo {
+  font-size: 12px;
+}
+@media (max-width: 1199px) {
+  .home-workspace--single {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: calc(100dvh - 32px);
+  }
+  .home-workspace--single .sidebar {
+    display: none;
+  }
+  .home-workspace--single .main-content {
+    padding: 24px;
+  }
+  .home-workspace--single .header__menu {
+    display: inline-flex;
+  }
+  .home-overview {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 800px) {
+  .home-workspace--single .main-content {
+    padding: 20px;
+  }
+  .home-header__top {
+    flex-wrap: wrap;
+  }
+  .home-header__top > .home-search {
+    order: 4;
+    flex-basis: 100%;
+  }
+  .home-header__top > .page-header {
+    flex: 1;
+  }
+  .home-overview__cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-task-filters {
+    gap: 16px;
+  }
+  .registration-comparison {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .home-resume {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 390px) {
+  .home-workspace--single .main-content {
+    padding: 16px;
+  }
+  .home-header__top > .button:last-child {
+    margin-left: auto;
+  }
+  .home-task-filters {
+    gap: 12px;
+  }
+  .home-task-filters button {
+    font: var(--wb-font-small);
+  }
+}
+
+.sidebar .account-menu__panel,
+.mobile-nav .account-menu__panel {
+  top: auto;
+  bottom: calc(100% + 8px);
+}
+@media (max-width: 800px) {
+  .home-header__top {
+    display: flex;
+  }
+}
+
+.registration-evidence {
+  background: var(--wb-color-canvas);
+}
+.home-workspace--single > .sidebar {
+  overflow: visible;
+}
