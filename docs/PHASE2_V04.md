@@ -29,7 +29,7 @@
 
 ## 검사와 로컬 실행
 
-검증 상태: 에이전트 환경에서 lint와 build를 통과했습니다. 로컬 서버 접근 제한 때문에 브라우저 검사는 완료하지 못했습니다. 사용자 터미널에서 UI 검사 결과를 확인한 뒤 갱신합니다.
+검증 상태: 사용자 로컬에서 lint, build와 지정한 공통 UI 34개 검사가 통과했습니다. 이슈 https://github.com/GDGoC-2026TeamA/Frontend/issues/19, 브랜치 `feat/#19`. 서버 통합 QA는 실행하지 않았으며 통과를 뜻하지 않습니다.
 
 ```powershell
 npm.cmd run dev
