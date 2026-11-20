@@ -1,3 +1,4 @@
+import { test as anonymousTest } from '@playwright/test'
 import { test, expect } from './workspace-fixture'
 import AxeBuilder from '@axe-core/playwright'
 
@@ -86,26 +87,45 @@ test('signup validates fields and first workspace has actions instead of someone
   expect(writes).toEqual([])
 })
 
-test('unconfigured social and reset requests never claim a real account or email delivery', async ({
-  page,
-}) => {
-  await page.goto('/login')
-  await capture(page, 'login')
-  await page.getByRole('button', { name: '카카오로 로그인' }).click()
-  await expect(page.getByRole('alert')).toContainText(
-    '소셜 로그인 서버가 연결되지 않았어요',
-  )
-  await page.getByRole('button', { name: 'Google로 로그인' }).click()
-  await expect(page).toHaveURL(/\/login$/)
-  await page.getByRole('link', { name: '비밀번호를 잊으셨나요?' }).click()
-  await page.getByLabel('이메일', { exact: false }).fill('first@example.com')
-  await page.getByRole('button', { name: '재설정 링크 보내기' }).click()
-  await expect(page.getByRole('alert')).toContainText(
-    '계정 서버가 연결되지 않았어요',
-  )
-  await expect(page).toHaveURL(/\/forgot-password$/)
-  await capture(page, 'reset-unconnected')
-})
+anonymousTest(
+  'unconfigured social login keeps the user on the login screen',
+  async ({ page }) => {
+    await page.goto('/login')
+    await capture(page, 'login')
+    await page.getByRole('button', { name: '카카오로 로그인' }).click()
+    await expect(page.getByRole('alert')).toContainText(
+      '소셜 로그인 서버가 연결되지 않았어요',
+    )
+    await page.getByRole('button', { name: 'Google로 로그인' }).click()
+    await expect(page.getByRole('alert')).toContainText(
+      '소셜 로그인 서버가 연결되지 않았어요',
+    )
+    await expect(page).toHaveURL(/\/login$/)
+  },
+)
+
+anonymousTest(
+  'unconfigured password reset stays on the form and sends no request',
+  async ({ page }) => {
+    const posts = []
+    await page.route('**/*', async (route) => {
+      if (route.request().method() !== 'POST') return route.continue()
+      posts.push(route.request().url())
+      await route.abort()
+    })
+    await page.goto('/login')
+    await page.getByRole('link', { name: '비밀번호를 잊으셨나요?' }).click()
+    await expect(page).toHaveURL(/\/forgot-password$/)
+    await page.getByLabel('이메일', { exact: false }).fill('first@example.com')
+    await page.getByRole('button', { name: '재설정 링크 보내기' }).click()
+    await expect(page.getByRole('alert')).toContainText(
+      '계정 서버가 연결되지 않았어요',
+    )
+    await expect(page).toHaveURL(/\/forgot-password$/)
+    expect(posts).toEqual([])
+    await capture(page, 'reset-unconnected')
+  },
+)
 
 test('profile and email edits save only locally while cancellation restores saved values', async ({
   page,

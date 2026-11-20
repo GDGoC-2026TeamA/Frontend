@@ -28,3 +28,14 @@ jobs:
       - run: npm run test:e2e
         env:
           VITE_DATA_MODE: demo
+          VITE_AUTH_RESET_REQUEST_PATH: ''
+          VITE_AUTH_KAKAO_START_URL: ''
+          VITE_AUTH_GOOGLE_START_URL: ''
+      - name: Preserve failed Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failures
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 5
