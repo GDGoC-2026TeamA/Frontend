@@ -84,6 +84,7 @@ test('download preserves bytes and filename header; DELETE 204 returns null', as
       headers: {
         'content-type': 'application/octet-stream',
         'content-disposition': 'attachment; filename="result.csv"',
+        'access-control-expose-headers': 'Content-Disposition',
       },
       body: Buffer.from([0, 128, 255, 10]),
     }),

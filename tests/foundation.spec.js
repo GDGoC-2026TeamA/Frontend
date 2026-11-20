@@ -8,7 +8,9 @@ test('main navigation, unfinished routes, and help modal', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: '내 업무', exact: true }),
   ).toBeVisible()
-  await expect(page.getByRole('searchbox')).toBeDisabled()
+  await expect(
+    page.getByRole('combobox', { name: '업무와 카드 검색' }),
+  ).toBeEnabled()
   const nav = page.getByRole('navigation', { name: '주요 메뉴', exact: true })
   await expect(nav.getByRole('link')).toHaveCount(3)
   await nav.getByRole('link', { name: '개인 업무 카드', exact: true }).click()
