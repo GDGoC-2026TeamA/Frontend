@@ -28,8 +28,9 @@ test('registration validates missing and real files without fabricating analysis
   await expect(
     page.getByRole('dialog', { name: '새 업무 등록', exact: true }),
   ).toBeVisible()
-  await page.getByRole('button', { name: '자료 분석하기', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('모두 입력')
+  await expect(
+    page.getByRole('button', { name: '자료 분석하기', exact: true }),
+  ).toBeDisabled()
   await page.getByLabel('업무 이름', { exact: false }).fill('실제 자료 점검')
   const inputs = page.locator('dialog input[type=file]')
   await inputs.nth(0).setInputFiles({

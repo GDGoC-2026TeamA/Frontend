@@ -80,9 +80,7 @@ test('API home shows loading, 404, retry, empty and server data without demo fal
   release()
   await expect(page.getByRole('alert')).toContainText('HTTP 404')
   await expect(page.locator('.work-tile')).toHaveCount(0)
-  await page
-    .getByRole('button', { name: '사용 방법 보기', exact: true })
-    .click()
+  await page.getByRole('button', { name: '가이드 보기', exact: true }).click()
   await expect(
     page.getByRole('dialog', { name: '사용 방법', exact: true }),
   ).toContainText('업무를 불러온 뒤')

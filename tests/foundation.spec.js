@@ -6,13 +6,13 @@ test('main navigation, unfinished routes, and help modal', async ({ page }) => {
   page.on('pageerror', (error) => errors.push(error.message))
   await page.goto('/')
   await expect(
-    page.getByRole('heading', { name: '내 업무', exact: true }),
+    page.getByRole('heading', { name: '홈', exact: true }),
   ).toBeVisible()
   await expect(
     page.getByRole('combobox', { name: '업무와 카드 검색' }),
   ).toBeEnabled()
   const nav = page.getByRole('navigation', { name: '주요 메뉴', exact: true })
-  await expect(nav.getByRole('link')).toHaveCount(3)
+  await expect(nav.getByRole('link')).toHaveCount(4)
   await nav.getByRole('link', { name: '개인 업무 카드', exact: true }).click()
   await expect(page).toHaveURL(/work-cards$/)
   await expect(
@@ -29,7 +29,7 @@ test('main navigation, unfinished routes, and help modal', async ({ page }) => {
   ).toBeVisible()
   await page.keyboard.press('Escape')
   await nav.getByRole('link', { name: '개인 업무 카드', exact: true }).click()
-  const help = page.getByRole('button', { name: '사용 방법 보기', exact: true })
+  const help = page.getByRole('button', { name: '가이드 보기', exact: true })
   await help.click()
   const dialog = page.getByRole('dialog', { name: 'WORK BRIDGE 사용 방법' })
   await expect(dialog).toBeVisible()
@@ -237,12 +237,14 @@ test('desktop and mobile layouts and accessibility', async ({
   )
   await expect(
     page.getByRole('complementary', { name: '빠른 확인' }),
-  ).toHaveCSS('width', '368px')
+  ).toHaveCount(0)
+  await expect(page.locator('.home-overview')).toBeVisible()
   const frame = await page.locator('.home-workspace').boundingBox()
-  expect(frame).toMatchObject({ x: 36, y: 58, width: 1368, height: 964 })
+  expect(frame).toMatchObject({ x: 36, y: 58, width: 1368 })
+  expect(frame.height).toBeGreaterThanOrEqual(1124)
   await expect(
     page.locator('.home-workspace > .app-layout__workspace'),
-  ).toHaveCSS('width', '792px')
+  ).toHaveCSS('width', '1160px')
   await expect(page.locator('.header')).toHaveCount(0)
   await page.screenshot({
     path: testInfo.outputPath('home-desktop.png'),
