@@ -40,6 +40,7 @@ async function service({
     DOMException,
     crypto: webcrypto,
     Event,
+    FormData,
   })
   const dependencies = {}
   const mock = (name, exports) =>
@@ -87,7 +88,31 @@ async function service({
       },
     },
   )
-  await source.link((specifier) => dependencies[specifier])
+  const modules = new Map()
+  async function link(specifier, parent) {
+    if (dependencies[specifier]) return dependencies[specifier]
+    const path = new URL(specifier + '.js', parent.identifier)
+    if (modules.has(path.href)) return modules.get(path.href)
+    const module = new vm.SourceTextModule(await readFile(path, 'utf8'), {
+      context,
+      identifier: path.href,
+      initializeImportMeta(meta) {
+        meta.env = {
+          VITE_DATA_MODE: mode,
+          ...(configured ? { VITE_AUTH_SESSION_PATH: 'session' } : {}),
+        }
+      },
+    })
+    modules.set(path.href, module)
+    await module.link(link)
+    return module
+  }
+  await source.link((specifier) =>
+    link(specifier, {
+      identifier: new URL('../src/services/accountService.js', import.meta.url)
+        .href,
+    }),
+  )
   await source.evaluate()
   return { api: source.namespace, store }
 }
@@ -211,4 +236,103 @@ test('missing configuration never sends invented requests and a late session res
   releaseLogin()
   await oldCheck
   assert.equal(loggingIn.api.useAccount().user.id, 'new-login')
+})
+
+test('Railway signup uses login_id and returns to login; login accepts token-only response and sends Bearer without cookies', async () => {
+  const calls = []
+  const token = 'server_token_for_test_12345678901234567890'
+  const { api, store } = await service({
+    mode: 'api',
+    configured: false,
+    fetcher: async (url, options) => {
+      calls.push({ url, ...options })
+      return {
+        ok: true,
+        status: url.endsWith('/accounts') ? 201 : 200,
+        json: async () =>
+          url.endsWith('/accounts')
+            ? { id: 42 }
+            : url.endsWith('/sessions')
+              ? { token }
+              : [{ id: 17, kind: 'personal' }],
+      }
+    },
+  })
+  const signup = {
+    name: '가입 사용자',
+    login_id: 'test.user',
+    email: 'new@example.com',
+    password: 'test-password',
+  }
+  const created = await api.accountRequest('signup', signup)
+  assert.equal(created.accountCreated, true)
+  assert.equal(api.useAccount().user, null)
+  assert.equal(calls[0].body, JSON.stringify(signup))
+  assert.equal(store.getItem('workbridge.server.session.v1'), null)
+  const result = await api.accountRequest('login', {
+    login_id: 'test.user',
+    password: signup.password,
+  })
+  api.acceptServerAccount(result)
+  assert.equal(api.useAccount().user.name, 'test.user')
+  const stored = store.getItem('workbridge.server.session.v1')
+  assert.ok(stored.includes(token))
+  assert.ok(!stored.includes(signup.password))
+  const session = await api.accountRequest('session')
+  assert.equal(session.user.name, 'test.user')
+  assert.equal(calls[2].headers.Authorization, `Bearer ${token}`)
+  assert.equal(calls[2].credentials, 'omit')
+  assert.ok(calls[2].url.endsWith('/workspaces'))
+  await api.signOut()
+  assert.equal(store.getItem('workbridge.server.session.v1'), null)
+  assert.equal(api.useAccount().user, null)
+})
+
+test('Railway token restoration requires a protected server read and 401 clears a forged token', async () => {
+  const store = storage()
+  store.setItem(
+    'workbridge.server.session.v1',
+    JSON.stringify({
+      base: 'https://gdgoc2026a.up.railway.app/api/v1',
+      token: 'forged_token_for_test_12345678901234567890',
+      loginId: 'forged',
+    }),
+  )
+  let status = 503
+  const { api } = await service({
+    mode: 'api',
+    configured: false,
+    store,
+    fetcher: async () => ({ ok: false, status, json: async () => ({}) }),
+  })
+  await api.restoreServerSession()
+  assert.equal(api.useAccount().status, 'error')
+  assert.equal(api.useAccount().user, null)
+  status = 401
+  await api.restoreServerSession()
+  assert.equal(api.useAccount().status, 'anonymous')
+  assert.equal(store.getItem('workbridge.server.session.v1'), null)
+})
+
+test('Railway rejects invalid credentials and malformed token responses without saving authentication', async () => {
+  for (const status of [401, 200]) {
+    const { api, store } = await service({
+      mode: 'api',
+      configured: false,
+      fetcher: async () => ({
+        ok: status === 200,
+        status,
+        json: async () => ({ token: 'invalid' }),
+      }),
+    })
+    await assert.rejects(
+      api.accountRequest('login', {
+        login_id: 'test.user',
+        password: 'bad-password',
+      }),
+      /아이디와 비밀번호|로그인 응답/,
+    )
+    assert.equal(store.getItem('workbridge.server.session.v1'), null)
+    assert.equal(api.useAccount().user, null)
+  }
 })
