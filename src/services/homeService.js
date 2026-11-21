@@ -1,5 +1,6 @@
 import { apiRequest } from './api/client'
 import { getDemoHome } from './demo/home'
+import { bearerAccounts } from './authToken'
 
 // These API shapes follow the tracker examples; missing values are not demo-filled.
 export async function getHomeDashboard({
@@ -9,6 +10,44 @@ export async function getHomeDashboard({
   if (mode === 'demo')
     return { ...(await getDemoHome({ signal })), source: 'demo' }
   if (mode !== 'api') throw new Error('지원하지 않는 데이터 모드예요.')
+  if (bearerAccounts) {
+    const spaces = await apiRequest('workspaces', { signal })
+    if (!Array.isArray(spaces))
+      throw new Error('작업 공간 응답을 확인해 주세요.')
+    const space = spaces.find((item) => item.kind === 'personal') || spaces[0]
+    if (!space)
+      return {
+        source: 'api',
+        tasks: [],
+        resumeJobs: [],
+        recentCards: [],
+        recentJobs: [],
+      }
+    if (!Number.isInteger(space.id))
+      throw new Error('작업 공간을 확인해 주세요.')
+    const [home, jobs] = await Promise.all([
+      apiRequest(`home?workspaceId=${space.id}`, { signal }),
+      apiRequest('jobs', { signal }),
+    ])
+    if (
+      !Array.isArray(home?.tasks) ||
+      !Array.isArray(home.continueJobs) ||
+      !Array.isArray(home.recentCards) ||
+      !Array.isArray(jobs)
+    )
+      throw new Error('서버 응답 형식을 확인해 주세요.')
+    return {
+      source: 'api',
+      tasks: home.tasks.map((task) => ({
+        ...task,
+        scope: task.isMine ? 'owned' : 'shared',
+        owner: task.creatorName,
+      })),
+      resumeJobs: home.continueJobs,
+      recentCards: home.recentCards,
+      recentJobs: jobs,
+    }
+  }
   const [home, jobs] = await Promise.all([
     apiRequest('home', { signal }),
     apiRequest('jobs', { signal }),

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
+import { bearerAccounts } from '../services/authToken'
 import { Button, Input, SaveToast, StatePanel } from '../components/ui'
 import {
   accountRequest,
@@ -98,9 +99,11 @@ export default function AccountPage({ settings = false }) {
             {settings ? '계정 설정' : '내 프로필'}
           </h1>
           <p className="account-subtitle">
-            {settings
-              ? '로그인 이메일과 비밀번호를 관리하세요.'
-              : '이름을 수정하고 계정 정보를 확인하세요.'}
+            {bearerAccounts
+              ? '로그인한 아이디를 확인하세요.'
+              : settings
+                ? '로그인 이메일과 비밀번호를 관리하세요.'
+                : '이름을 수정하고 계정 정보를 확인하세요.'}
           </p>
           {demoAccounts && (
             <p className="account-demo-note">
@@ -130,6 +133,21 @@ export default function AccountPage({ settings = false }) {
                 } else navigate('/login')
               }}
             />
+          ) : bearerAccounts ? (
+            <section className="account-card">
+              <h2>로그인 정보</h2>
+              <Input label="아이디" value={user.name} readOnly />
+              <p>이름과 이메일 조회, 변경은 아직 서버에 연결되지 않았어요.</p>
+              <p>로그아웃하면 이 탭의 로그인 정보가 지워져요.</p>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  window.dispatchEvent(new Event('workbridge:logout'))
+                }
+              >
+                로그아웃
+              </Button>
+            </section>
           ) : (
             <>
               <section className="account-card">

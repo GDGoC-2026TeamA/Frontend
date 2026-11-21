@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from 'react'
+import { bearerAccounts, clearServerToken } from './authToken'
+import { bearerAccountRequest } from './bearerAccount'
 import { clearDemoTasks } from './demo/taskWorkspace'
 import { clearDemoWork } from './demo/workWorkspace'
 import { clearLearningSessions } from './learningSessions'
@@ -53,6 +55,7 @@ export function clearPrivateWorkspace() {
 }
 export function expireAccount() {
   sessionGeneration += 1
+  clearServerToken()
   removeExampleSession()
   clearPrivateWorkspace()
   setAccount({
@@ -108,10 +111,14 @@ const paths = {
   logout: import.meta.env.VITE_AUTH_LOGOUT_PATH,
 }
 export const hasAccountEndpoint = (action) =>
-  Boolean(
-    paths[action] && (!['login', 'signup'].includes(action) || paths.session),
-  )
+  bearerAccounts
+    ? ['login', 'signup', 'session'].includes(action)
+    : Boolean(
+        paths[action] &&
+        (!['login', 'signup'].includes(action) || paths.session),
+      )
 export async function accountRequest(action, body, { signal } = {}) {
+  if (bearerAccounts) return bearerAccountRequest(action, body, { signal })
   const path = paths[action]
   if (!hasAccountEndpoint(action))
     throw Object.assign(
@@ -194,6 +201,7 @@ export function restoreServerSession() {
     })
     .catch((cause) => {
       if (generation !== sessionGeneration) return
+      if (bearerAccounts && cause.status === 401) clearServerToken()
       if (cause.status === 401 || cause.code === 'AUTH_NOT_CONFIGURED')
         setAccount({
           user: null,
@@ -243,7 +251,8 @@ export async function saveAccount(action, value, options) {
   })
 }
 export async function signOut(options) {
-  if (!demoAccounts) await accountRequest('logout', undefined, options)
+  if (!demoAccounts && !bearerAccounts)
+    await accountRequest('logout', undefined, options)
   expireAccount()
 }
 export function socialStartUrl(provider) {

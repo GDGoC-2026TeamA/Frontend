@@ -1,4 +1,5 @@
-// Transport for the API tracker. Screens remain in demo mode until connected.
+import { bearerAccounts, readServerToken } from '../authToken'
+
 export class ApiError extends Error {
   constructor(message, status) {
     super(message)
@@ -24,13 +25,17 @@ export async function apiRequest(
   }
   if (body !== undefined && !isForm)
     headers['Content-Type'] = 'application/json'
+  const token = readServerToken()?.token
+  if (token) headers.Authorization = `Bearer ${token}`
   const response = await fetch(
     `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`,
     {
       method,
-      ...(import.meta.env.VITE_AUTH_SESSION_PATH
-        ? { credentials: 'include' }
-        : {}),
+      ...(bearerAccounts
+        ? { credentials: 'omit' }
+        : import.meta.env.VITE_AUTH_SESSION_PATH
+          ? { credentials: 'include' }
+          : {}),
       signal,
       headers,
       // The browser must add the multipart boundary for FormData.
@@ -38,14 +43,25 @@ export async function apiRequest(
     },
   )
   if (!response.ok) {
-    if (response.status === 401 && import.meta.env.VITE_AUTH_SESSION_PATH)
+    if (
+      response.status === 401 &&
+      (token || import.meta.env.VITE_AUTH_SESSION_PATH)
+    )
       window.dispatchEvent(new Event('workbridge:session-expired'))
     throw new ApiError(
-      '요청을 마치지 못했어요. 잠시 후 다시 시도해 주세요.',
+      response.status === 401 && path === 'sessions'
+        ? '아이디와 비밀번호를 다시 확인해 주세요.'
+        : response.status === 409 && path === 'accounts'
+          ? '이미 등록된 계정이에요. 아이디와 이메일을 확인해 주세요.'
+          : response.status === 422
+            ? '입력한 정보의 형식을 확인해 주세요.'
+            : '요청을 마치지 못했어요. 잠시 후 다시 시도해 주세요.',
       response.status,
     )
   }
   if (responseType === 'response') return response
   if (response.status === 204) return null
-  return response.json()
+  const result = await response.json()
+  signal?.throwIfAborted()
+  return result
 }

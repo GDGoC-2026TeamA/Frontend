@@ -1,5 +1,7 @@
 # 최종 상태, 계정과 업무 관리
 
+> 2026-11-21 후속 수정: 현재 Railway 서버는 아이디와 Bearer 인증을 씁니다. 실제 서버 연결은 [BEARER_LOGIN.md](BEARER_LOGIN.md)를 따르세요. 아래의 계정 경로 미구현 안내와 쿠키 규격은 이전 상태입니다.
+
 React와 Vite의 기존 화면에 나머지 다섯 섹션을 연결했습니다. 작업 기준은 Figma `wX9g6gKuJztvTMWGIhtr9j`의 `02 · Dashboard Explorations` 페이지입니다. 노션의 프론트엔드 협업 가이드와 API 작업 트래커를 2026-11-21 한국 시간에 확인했습니다.
 
 기준 문서는 [프론트엔드 협업 가이드](https://app.notion.com/p/4423a23d4c0e82ff9a0f01593d4a52ca)와 [API 작업 트래커](https://app.notion.com/p/22d3a23d4c0e8325bff901f4cb073d84)입니다.
