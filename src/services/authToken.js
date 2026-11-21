@@ -8,6 +8,16 @@ export const accountApiBase = (
 ).replace(/\/$/, '')
 const key = 'workbridge.server.session.v1'
 
+function validSocialUser(user) {
+  return (
+    Number.isSafeInteger(user?.id) &&
+    user.id > 0 &&
+    typeof user.name === 'string' &&
+    user.name.trim() &&
+    typeof user.email === 'string'
+  )
+}
+
 export function readServerToken() {
   if (!bearerAccounts) return null
   try {
@@ -16,8 +26,9 @@ export function readServerToken() {
       saved?.base === accountApiBase &&
       typeof saved.token === 'string' &&
       /^[A-Za-z0-9_-]{32,}$/.test(saved.token) &&
-      typeof saved.loginId === 'string' &&
-      /^[A-Za-z0-9_.-]{1,64}$/.test(saved.loginId)
+      (validSocialUser(saved.user) ||
+        (typeof saved.loginId === 'string' &&
+          /^[A-Za-z0-9_.-]{1,64}$/.test(saved.loginId)))
     )
       return saved
   } catch {
@@ -27,12 +38,24 @@ export function readServerToken() {
 }
 
 export function saveServerToken(token, loginId) {
+  persistSession(token, { loginId })
+}
+
+export function saveSocialSession(token, user) {
+  if (!validSocialUser(user))
+    throw new Error('소셜 계정 정보를 확인할 수 없어요.')
+  persistSession(token, {
+    user: { id: user.id, name: user.name, email: user.email },
+  })
+}
+
+function persistSession(token, display) {
   if (typeof token !== 'string' || !/^[A-Za-z0-9_-]{32,}$/.test(token))
     throw new Error('로그인 응답을 확인할 수 없어요. 다시 시도해 주세요.')
   try {
     sessionStorage.setItem(
       key,
-      JSON.stringify({ base: accountApiBase, token, loginId }),
+      JSON.stringify({ base: accountApiBase, token, ...display }),
     )
   } catch {
     throw new Error(
