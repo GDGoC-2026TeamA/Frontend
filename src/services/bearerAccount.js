@@ -35,7 +35,7 @@ export async function bearerAccountRequest(action, body, { signal } = {}) {
     const spaces = await apiRequest('workspaces', { signal })
     if (!Array.isArray(spaces))
       throw new Error('로그인 상태를 확인할 수 없어요. 다시 시도해 주세요.')
-    return identity(saved.loginId)
+    return saved.user ? { user: saved.user } : identity(saved.loginId)
   }
   throw Object.assign(
     new Error('아직 이 계정 기능은 서버에 연결되지 않았어요.'),

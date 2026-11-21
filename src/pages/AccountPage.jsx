@@ -136,7 +136,11 @@ export default function AccountPage({ settings = false }) {
           ) : bearerAccounts ? (
             <section className="account-card">
               <h2>로그인 정보</h2>
-              <Input label="아이디" value={user.name} readOnly />
+              <Input
+                label={Number.isInteger(user.id) ? '소셜 계정 이름' : '아이디'}
+                value={user.name}
+                readOnly
+              />
               <p>이름과 이메일 조회, 변경은 아직 서버에 연결되지 않았어요.</p>
               <p>로그아웃하면 이 탭의 로그인 정보가 지워져요.</p>
               <Button

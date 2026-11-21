@@ -13,7 +13,8 @@ import {
   hasAccountEndpoint,
 } from '../services/accountService'
 import inventory from '../assets/home/inventory.svg?no-inline'
-import { bearerAccounts } from '../services/authToken'
+import { beginSocialLogin, finishSocialLogin } from '../services/socialLogin'
+import { bearerAccounts, saveSocialSession } from '../services/authToken'
 
 const titles = {
   '/login': '로그인',
@@ -47,6 +48,7 @@ export default function AuthPage() {
   const active = useRef(null)
   const locked = useRef(false)
   const heading = useRef(null)
+  const callbackExchange = useRef(null)
   useEffect(() => {
     document.title = `${titles[route] || '로그인'} | WORK BRIDGE`
     heading.current?.focus()
@@ -54,6 +56,31 @@ export default function AuthPage() {
   }, [route])
   useEffect(() => {
     if (route !== '/auth/callback') return
+    if (bearerAccounts) {
+      let mounted = true
+      if (!callbackExchange.current) {
+        const fragment = window.location.hash
+        window.history.replaceState(
+          window.history.state,
+          '',
+          window.location.pathname,
+        )
+        callbackExchange.current = finishSocialLogin(fragment)
+      }
+      callbackExchange.current
+        .then(({ result, returnTo }) => {
+          if (!mounted) return
+          saveSocialSession(result?.token, result?.user)
+          acceptServerAccount(result)
+          navigate(safeReturnPath(returnTo), { replace: true })
+        })
+        .catch((cause) => {
+          if (mounted) setError(cause.message)
+        })
+      return () => {
+        mounted = false
+      }
+    }
     const controller = new AbortController()
     // The server verifies OAuth state, authorization code and its session cookie.
     // Query-string success/user/token values are never accepted as authentication.
@@ -173,11 +200,20 @@ export default function AuthPage() {
       if (!controller.signal.aborted) setBusy(false)
     }
   }
-  const social = (name) => {
+  const social = async (name) => {
     setProvider(name)
     setError('')
     try {
       const url = socialStartUrl(name)
+      if (bearerAccounts) {
+        setBusy(true)
+        await beginSocialLogin(
+          name,
+          url,
+          safeReturnPath(location.state?.returnTo),
+        )
+        return
+      }
       if (!url) {
         setProvider(name)
         setError(

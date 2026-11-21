@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { createHash } from 'node:crypto'
 import { spawn } from 'node:child_process'
 
 const port = 5180
@@ -59,6 +60,67 @@ async function workspace(page) {
   await page.route('**/api/v1/jobs', (route) => route.fulfill({ json: [] }))
 }
 
+for (const [provider, label] of [
+  ['google', 'Google'],
+  ['kakao', '카카오'],
+]) {
+  test(
+    provider +
+      ' starts at the backend, exchanges once and restores the session',
+    async ({ page }) => {
+      await workspace(page)
+      const code = 'c'.repeat(43)
+      let challenge
+      let exchanges = 0
+      await page.route(
+        '**/sessions/social/' + provider + '/start?*',
+        (route) => {
+          challenge = new URL(route.request().url()).searchParams.get(
+            'challenge',
+          )
+          return route.fulfill({
+            status: 303,
+            headers: { location: base + '/auth/callback#code=' + code },
+          })
+        },
+      )
+      await page.route('**/sessions/social/exchange', async (route) => {
+        const body = route.request().postDataJSON()
+        expect(body.code).toBe(code)
+        expect(
+          createHash('sha256').update(body.verifier).digest('base64url'),
+        ).toBe(challenge)
+        exchanges++
+        await route.fulfill({
+          json: { token, user: { id: 12, name: '소셜 사용자', email: '' } },
+        })
+      })
+      await page.goto(base + '/login')
+      await page.getByRole('button', { name: label + '로 로그인' }).click()
+      await expect(page).toHaveURL(base + '/')
+      await expect(
+        page.getByRole('heading', { name: '등록된 업무가 없어요' }),
+      ).toBeVisible()
+      await page.reload()
+      await expect(
+        page.getByRole('heading', { name: '등록된 업무가 없어요' }),
+      ).toBeVisible()
+      expect(exchanges).toBe(1)
+    },
+  )
+}
+
+test('unsolicited social callback does not create a session', async ({
+  page,
+}) => {
+  await page.goto(base + '/auth/callback#code=' + 'c'.repeat(43))
+  await expect(page.getByRole('alert')).toContainText('다시 로그인')
+  expect(
+    await page.evaluate((key) => sessionStorage.getItem(key), sessionKey),
+  ).toBeNull()
+  await expect(page).toHaveURL(base + '/auth/callback')
+})
+
 async function login(page) {
   await page.getByLabel('아이디 (필수)', { exact: true }).fill('test.user')
   await page
@@ -107,7 +169,7 @@ test('signup sends login_id, then login accepts a token, opens home and revalida
   await login(page)
   await expect(page).toHaveURL(base + '/')
   await expect(
-    page.getByRole('heading', { name: '첫 업무를 등록해 보세요' }),
+    page.getByRole('heading', { name: '등록된 업무가 없어요' }),
   ).toBeVisible()
   const saved = await page.evaluate(
     (key) => sessionStorage.getItem(key),
