@@ -13,6 +13,7 @@ import {
   hasAccountEndpoint,
 } from '../services/accountService'
 import inventory from '../assets/home/inventory.svg?no-inline'
+import { bearerAccounts } from '../services/authToken'
 
 const titles = {
   '/login': '로그인',
@@ -33,6 +34,7 @@ export default function AuthPage() {
   const login = route === '/login'
   const reset = route === '/reset-password'
   const [values, setValues] = useState({
+    loginId: location.state?.loginId || '',
     name: '',
     email: '',
     password: '',
@@ -73,7 +75,18 @@ export default function AuthPage() {
     if (locked.current) return
     const next = {}
     if (signup && !values.name.trim()) next.name = '이름을 입력해 주세요.'
-    if (!reset && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim()))
+    if (
+      bearerAccounts &&
+      (signup || login) &&
+      !/^[A-Za-z0-9_.-]{1,64}$/.test(values.loginId.trim())
+    )
+      next.loginId =
+        '아이디는 영문, 숫자, 밑줄, 마침표, 하이픈으로 1~64자 입력해 주세요.'
+    if (
+      !reset &&
+      !(bearerAccounts && login) &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())
+    )
       next.email = '이메일 형식을 확인해 주세요.'
     if ((login || signup || reset) && !values.password)
       next.password = '비밀번호를 입력해 주세요.'
@@ -108,12 +121,26 @@ export default function AuthPage() {
           signup ? 'signup' : 'login',
           {
             ...(signup ? { name: values.name.trim() } : {}),
-            email: values.email.trim(),
+            ...(bearerAccounts
+              ? {
+                  login_id: values.loginId.trim(),
+                  ...(signup ? { email: values.email.trim() } : {}),
+                }
+              : { email: values.email.trim() }),
             password: values.password,
           },
           { signal: controller.signal },
         )
-        if (signup && result?.verificationRequired === true)
+        if (signup && result?.accountCreated === true)
+          navigate('/login', {
+            replace: true,
+            state: {
+              signupComplete: true,
+              loginId: values.loginId.trim(),
+              returnTo: location.state?.returnTo,
+            },
+          })
+        else if (signup && result?.verificationRequired === true)
           navigate('/verify-email', { state: { email: values.email.trim() } })
         else {
           acceptServerAccount(result)
@@ -182,7 +209,9 @@ export default function AuthPage() {
         ? '가입할 때 입력한 이메일을 적어 주세요.'
         : location.state?.passwordChanged
           ? '변경한 비밀번호로 다시 로그인해 주세요.'
-          : '소셜 계정이나 이메일로 내 작업 공간을 열어요.'
+          : bearerAccounts
+            ? '가입할 때 정한 아이디로 내 작업 공간을 열어요.'
+            : '소셜 계정이나 이메일로 내 작업 공간을 열어요.'
   return (
     <main className="auth-page">
       <section className="auth-shell" aria-labelledby="auth-title">
@@ -211,6 +240,11 @@ export default function AuthPage() {
                   : titles[route] || '로그인'}
           </h1>
           {!statusOnly && <p className="auth-description">{description}</p>}
+          {login && location.state?.signupComplete && (
+            <p className="account-demo-note" role="status">
+              회원가입을 마쳤어요. 가입한 아이디와 비밀번호로 로그인해 주세요.
+            </p>
+          )}
           {!demoAccounts &&
             (login || signup) &&
             !hasAccountEndpoint(signup ? 'signup' : 'login') && (
@@ -257,7 +291,9 @@ export default function AuthPage() {
                   Google로 {signup ? '시작하기' : '로그인'}
                 </Button>
               </div>
-              <div className="auth-divider">또는 이메일로 계속하기</div>
+              <div className="auth-divider">
+                또는 {bearerAccounts ? '아이디' : '이메일'}로 계속하기
+              </div>
             </>
           )}
           {!statusOnly && (
@@ -273,7 +309,19 @@ export default function AuthPage() {
                   required
                 />
               )}
-              {!reset && (
+              {bearerAccounts && (login || signup) && (
+                <Input
+                  label="아이디"
+                  autoComplete="username"
+                  maxLength={64}
+                  value={values.loginId}
+                  onChange={update('loginId')}
+                  error={errors.loginId}
+                  hint="영문, 숫자, 밑줄, 마침표, 하이픈을 쓸 수 있어요."
+                  required
+                />
+              )}
+              {!reset && !(bearerAccounts && login) && (
                 <Input
                   label="이메일"
                   type="email"
